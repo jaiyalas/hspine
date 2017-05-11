@@ -1,0 +1,7 @@
+/Users/jaiyalas/Project/mega-eye/spine-c-haskell/extra/spine-c/build/CMakeFiles/install/local.dir
+/Users/jaiyalas/Project/mega-eye/spine-c-haskell/extra/spine-c/build/CMakeFiles/install/strip.dir
+/Users/jaiyalas/Project/mega-eye/spine-c-haskell/extra/spine-c/build/CMakeFiles/install.dir
+/Users/jaiyalas/Project/mega-eye/spine-c-haskell/extra/spine-c/build/CMakeFiles/list_install_components.dir
+/Users/jaiyalas/Project/mega-eye/spine-c-haskell/extra/spine-c/build/CMakeFiles/rebuild_cache.dir
+/Users/jaiyalas/Project/mega-eye/spine-c-haskell/extra/spine-c/build/CMakeFiles/edit_cache.dir
+/Users/jaiyalas/Project/mega-eye/spine-c-haskell/extra/spine-c/build/CMakeFiles/spine-c.dir
