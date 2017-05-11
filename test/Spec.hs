@@ -1,4 +1,4 @@
 import Spine
 
 main :: IO ()
-main = yo
+main = yo2
