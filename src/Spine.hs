@@ -9,6 +9,7 @@ module Spine
     , module Spine.Raw.Skeleton
     , module Spine.Raw.SkeletonData
     , module Spine.Raw.Slot
+    , test01, test02
     ) where
 --
 import Spine.Raw.Test
