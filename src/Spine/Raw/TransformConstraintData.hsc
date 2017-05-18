@@ -2,5 +2,5 @@ module Spine.Raw.TransformConstraintData where
 --
 #include "spine/TransformConstraintData.h"
 --
-import Foreign.C.Types
+-- import Foreign.C.Types
 --

@@ -2,5 +2,5 @@ module Spine.Raw.MeshAttachment where
 --
 #include "spine/MeshAttachment.h"
 --
-import Foreign.C.Types
+-- import Foreign.C.Types
 --

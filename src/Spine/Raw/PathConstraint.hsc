@@ -2,5 +2,5 @@ module Spine.Raw.PathConstraint where
 --
 #include "spine/PathConstraint.h"
 --
-import Foreign.C.Types
+-- import Foreign.C.Types
 --

@@ -5,11 +5,11 @@ module Spine.Raw.BoneData where
 import Foreign.Ptr
 import Foreign.C.Types
 import Foreign.C.String
-import Foreign.Storable
+-- import Foreign.Storable
 --
-import Data.Default
-import Spine.Raw.Enum
-import Spine.Raw.Struct
+-- import Data.Default
+-- import Spine.Raw.InternalEnum
+import Spine.Raw.InternalStruct
 --
 
 foreign import ccall "spBoneData_create" spBoneData_create_FFI ::

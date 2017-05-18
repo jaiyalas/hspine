@@ -2,5 +2,5 @@ module Spine.Raw.IkConstraint where
 --
 #include "spine/IkConstraint.h"
 --
-import Foreign.C.Types
+-- import Foreign.C.Types
 --

@@ -4,6 +4,6 @@ module Spine.Raw.Bone where
 --
 import Spine.Raw.Skeleton
 --
-import Control.Monad.IO.Class
-import Foreign.C.Types
+-- import Control.Monad.IO.Class
+-- import Foreign.C.Types
 --

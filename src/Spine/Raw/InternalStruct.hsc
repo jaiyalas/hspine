@@ -10,7 +10,7 @@ import Foreign.C.String
 import Foreign.Storable
 --
 import Data.Default
-import Spine.Raw.Enum
+import Spine.Raw.InternalEnum
 --
 #if __GLASGOW_HASKELL__ < 800
 #let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)

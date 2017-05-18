@@ -57,10 +57,13 @@ library
     ghc-options: -Wall
     exposed-modules:
         Spine
+        --
+        Spine.Raw
         Spine.Raw.InternalTest
+        --
         Spine.Raw.InternalEnum
         Spine.Raw.InternalStruct
-        -- -- --
+        --
         Spine.Raw.Animation
         Spine.Raw.AnimationState
         Spine.Raw.AnimationStateData
