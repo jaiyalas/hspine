@@ -1,7 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE PatternSynonyms #-}
 --
-module Spine.Raw.Test where
+module Spine.Raw.InternalTest where
 --
 import Control.Monad.IO.Class
 import Foreign.C.Types
