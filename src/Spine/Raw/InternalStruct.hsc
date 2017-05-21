@@ -1,8 +1,35 @@
 module Spine.Raw.InternalStruct where
 --
+#include "spine/Animation.h"
+#include "spine/AnimationState.h"
+#include "spine/AnimationStateData.h"
+#include "spine/Atlas.h"
+#include "spine/AtlasAttachmentLoader.h"
 #include "spine/Attachment.h"
 #include "spine/AttachmentLoader.h"
+#include "spine/Bone.h"
 #include "spine/BoneData.h"
+#include "spine/BoundingBoxAttachment.h"
+#include "spine/Event.h"
+#include "spine/EventData.h"
+#include "spine/IkConstraint.h"
+#include "spine/IkConstraintData.h"
+#include "spine/MeshAttachment.h"
+#include "spine/PathAttachment.h"
+#include "spine/PathConstraint.h"
+#include "spine/PathConstraintData.h"
+#include "spine/RegionAttachment.h"
+#include "spine/Skeleton.h"
+#include "spine/SkeletonBinary.h"
+#include "spine/SkeletonBounds.h"
+#include "spine/SkeletonData.h"
+#include "spine/SkeletonJson.h"
+#include "spine/Skin.h"
+#include "spine/Slot.h"
+#include "spine/SlotData.h"
+#include "spine/TransformConstraint.h"
+#include "spine/TransformConstraintData.h"
+#include "spine/VertexAttachment.h"
 --
 import Foreign.Ptr
 import Foreign.C.Types
@@ -16,8 +43,16 @@ import Spine.Raw.InternalEnum
 #let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
 #endif
 --
+--  "spine/Animation"
 
--- "spine/BoneData.h"
+--  "spine/AnimationState"
+--  "spine/AnimationStateData"
+--  "spine/Atlas"
+--  "spine/AtlasAttachmentLoader"
+--  "spine/Attachment"
+--  "spine/AttachmentLoader"
+--  "spine/Bone"
+--  "spine/BoneData"
 data SpBoneData = SpBoneData
     { spBoneData_index    :: CInt
     , spBoneData_name     :: CString
@@ -32,7 +67,6 @@ data SpBoneData = SpBoneData
     , spBoneData_shearY   :: CFloat
     , spBoneData_transformMode :: TransformMode
     } deriving (Show, Eq)
---
 instance Storable SpBoneData where
     alignment _ = #{alignment spBoneData}
     sizeOf _ = #{size spBoneData}
@@ -63,6 +97,27 @@ instance Storable SpBoneData where
         #{poke spBoneData, shearX} ptr shx
         #{poke spBoneData, shearY} ptr shy
         #{poke spBoneData, transformMode} ptr t
---
 instance Default SpBoneData where
     def = SpBoneData 0 nullPtr nullPtr 0 0 0 0 0 0 0 0 TRANSFORMMODE_NORMAL
+
+--  "spine/BoundingBoxAttachment"
+--  "spine/Event"
+--  "spine/EventData"
+--  "spine/IkConstraint"
+--  "spine/IkConstraintData"
+--  "spine/MeshAttachment"
+--  "spine/PathAttachment"
+--  "spine/PathConstraint"
+--  "spine/PathConstraintData"
+--  "spine/RegionAttachment"
+--  "spine/Skeleton"
+--  "spine/SkeletonBinary"
+--  "spine/SkeletonBounds"
+--  "spine/SkeletonData"
+--  "spine/SkeletonJson"
+--  "spine/Skin"
+--  "spine/Slot"
+--  "spine/SlotData"
+--  "spine/TransformConstraint"
+--  "spine/TransformConstraintData"
+--  "spine/VertexAttachment"

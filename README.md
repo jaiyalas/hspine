@@ -6,6 +6,39 @@
     + 連結測試 SFML
     + 參考 spine-sfml
 
+## todo
+
++ [ ] Animation
++ [ ] AnimationState
++ [ ] AnimationStateData
++ [ ] Atlas
++ [ ] AtlasAttachmentLoader
++ [ ] Attachment
++ [ ] AttachmentLoader
++ [ ] Bone
++ [ ] BoneData
++ [ ] BoundingBoxAttachment
++ [ ] Event
++ [ ] EventData
++ [ ] IkConstraint
++ [ ] IkConstraintData
++ [ ] MeshAttachment
++ [ ] PathAttachment
++ [ ] PathConstraint
++ [ ] PathConstraintData
++ [ ] RegionAttachment
++ [ ] Skeleton
++ [ ] SkeletonBinary
++ [ ] SkeletonBounds
++ [ ] SkeletonData
++ [ ] SkeletonJson
++ [ ] Skin
++ [ ] Slot
++ [ ] SlotData
++ [ ] TransformConstraint
++ [ ] TransformConstraintData
++ [ ] VertexAttachment
+
 ## malloc, free and pointer op
 
 + [Foreign.Marshal.Array](https://hackage.haskell.org/package/base-4.9.1.0/docs/Foreign-Marshal-Array.html)
