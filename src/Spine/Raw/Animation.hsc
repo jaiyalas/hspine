@@ -167,83 +167,62 @@ instance Storable SpAttachmentTimeline where
 instance Default SpAttachmentTimeline where
     def = SpAttachmentTimeline nullPtr 0 nullPtr 0 nullPtr
 
+-- | SpEventTimeline
+data SpEventTimeline = SpEventTimeline
+    { spEventTimeline_super       :: SpTimeline
+    , spEventTimeline_framesCount :: CInt
+    , spEventTimeline_frames      :: Ptr CFloat -- ^ time, ...
+    , spEventTimeline_events      :: Ptr (Ptr SpEvent)
+    } deriving (Show, Eq)
+instance Storable SpEventTimeline where
+    alignment _ = #{alignment spEventTimeline}
+    sizeOf _    = #{size      spEventTimeline}
+    peek ptr = do
+        s <- #{peek spEventTimeline, super} ptr
+        fc <- #{peek spEventTimeline, framesCount} ptr
+        fs <- #{peek spEventTimeline, frames} ptr
+        es <- #{peek spEventTimeline, events} ptr
+        return (SpEventTimeline s fc fs es)
+    poke ptr (SpEventTimeline s fc fs es) = do
+        #{poke spEventTimeline, super}           ptr s
+        #{poke spEventTimeline, framesCount}     ptr fc
+        #{poke spEventTimeline, frames}          ptr fs
+        #{poke spEventTimeline, events}          ptr es
+instance Default SpEventTimeline where
+    def = SpEventTimeline nullPtr 0 nullPtr nullPtr
+
+-- | SpDrawOrderTimeline
+data SpDrawOrderTimeline = SpDrawOrderTimeline
+    { spDrawOrderTimeline_super       :: SpTimeline
+    , spDrawOrderTimeline_framesCount :: CInt
+    , spDrawOrderTimeline_frames      :: Ptr CFloat -- ^ time, ...
+    , spDrawOrderTimeline_drawOrders  :: Ptr (Ptr CInt)
+    , spDrawOrderTimeline_slotsCount  :: CInt
+    } deriving (Show, Eq)
+instance Storable SpDrawOrderTimeline where
+    alignment _ = #{alignment spDrawOrderTimeline}
+    sizeOf _    = #{size      spDrawOrderTimeline}
+    peek ptr = do
+        s  <- #{peek spDrawOrderTimeline, super}       ptr
+        fc <- #{peek spDrawOrderTimeline, framesCount} ptr
+        fs <- #{peek spDrawOrderTimeline, frames}      ptr
+        d  <- #{peek spDrawOrderTimeline, drawOrders}  ptr
+        sc <- #{peek spDrawOrderTimeline, slotsCount}  ptr
+        return (SpDrawOrderTimeline s fc fs d sc)
+    poke ptr (SpDrawOrderTimeline s fc fs d sc) = do
+        #{poke spDrawOrderTimeline, super}           ptr s
+        #{poke spDrawOrderTimeline, framesCount}     ptr fc
+        #{poke spDrawOrderTimeline, frames}          ptr fs
+        #{poke spDrawOrderTimeline, drawOrders}      ptr d
+        #{poke spDrawOrderTimeline, slotsCount}      ptr sc
+instance Default SpDrawOrderTimeline where
+    def = SpDrawOrderTimeline nullPtr 0 nullPtr nullPtr 0
 
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-typedef struct spAttachmentTimeline {
-	spTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
-	int slotIndex;
-	const char** const attachmentNames;
-
-#ifdef __cplusplus
-	spAttachmentTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		slotIndex(0),
-		attachmentNames(0) {
-	}
-#endif
-} spAttachmentTimeline;
-
-
-
-
-typedef struct spEventTimeline {
-	spTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
-	spEvent** const events;
-
-#ifdef __cplusplus
-	spEventTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		events(0) {
-	}
-#endif
-} spEventTimeline;
-
-
-
-
-typedef struct spDrawOrderTimeline {
-	spTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
-	const int** const drawOrders;
-	int const slotsCount;
-#ifdef __cplusplus
-	spDrawOrderTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		drawOrders(0),
-		slotsCount(0) {
-	}
-#endif
-} spDrawOrderTimeline;
 
 
 
