@@ -649,8 +649,7 @@ foreign import ccall "spPathConstraintMixTimeline_setFrame" spPathConstraintMixT
 
 
 
-
-
+-- constants
 pattern ROTATE_PREV_TIME :: CInt
 pattern ROTATE_PREV_TIME = #{const ROTATE_PREV_TIME}
 pattern ROTATE_PREV_ROTATION :: CInt
