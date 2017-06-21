@@ -218,6 +218,21 @@ instance Storable SpDrawOrderTimeline where
 instance Default SpDrawOrderTimeline where
     def = SpDrawOrderTimeline nullPtr 0 nullPtr nullPtr 0
 
+-- | SpDeformTimeline
+data SpDeformTimeline = spDeformTimeline
+    { spDeformTimeline_super :: spCurveTimeline
+    , spDeformTimeline_framesCount :: CInt
+    , spDeformTimeline_frames :: Ptr CFloat -- ^ /* time, ... */
+    , spDeformTimeline_frameVerticesCount :: CInt
+    , spDeformTimeline_frameVertices :: Ptr (Ptr CFloat)
+    , spDeformTimeline_slotIndex :: CInt
+    , spDeformTimeline_attachment :: Ptr SpAttachment
+    } deriving (Show, Eq)
+--
+
+--
+instance Default SpDeformTimeline where
+    def = SpDeformTimeline nullPtr 0 nullPtr 0 nullPtr 0 nullPtr
 
 
 
@@ -227,26 +242,7 @@ instance Default SpDrawOrderTimeline where
 
 
 
-typedef struct spDeformTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, ... */
-	int const frameVerticesCount;
-	const float** const frameVertices;
-	int slotIndex;
-	spAttachment* attachment;
 
-#ifdef __cplusplus
-	spDeformTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		frameVerticesCount(0),
-		frameVertices(0),
-		slotIndex(0) {
-	}
-#endif
-} spDeformTimeline;
 
 
 
