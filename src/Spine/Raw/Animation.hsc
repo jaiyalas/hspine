@@ -241,11 +241,6 @@ instance Default SpDeformTimeline where
 
 
 
-
-
-
-
-
 typedef struct spIkConstraintTimeline {
 	spCurveTimeline super;
 	int const framesCount;
