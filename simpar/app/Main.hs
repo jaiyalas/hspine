@@ -4,16 +4,17 @@ import Lib
 --
 import Text.Parsec
 import Data.Char
+import System.Environment (getArgs)
 --
 main :: IO ()
-main = do
-    -- let x = parse expressionParser "" "(1+(3-4))"
-    let x = parse (optionMaybe (many $ oneOf "0123456789")) "" "123"
-    putStrLn $ show x
-    let y = parse (optionMaybe (many $ oneOf "0123456789")) "" "abc"
-    putStrLn $ show y
-    let z = parse (optionMaybe (many1 $ oneOf "0123456789")) "" "abc"
-    putStrLn $ show z
+main =
+    getArgs >>=
+    (putStrLn . either show pp . pStruct . rmLn . head)
+
+
+
+rmLn :: String -> String
+rmLn str = filter (/= '\n') str
 
 pStruct :: String -> Either ParseError StructEntity
 pStruct = parse pStructEntity ""
@@ -46,15 +47,76 @@ data FTyp
 class PP a where
     pp :: a -> String
 instance PP StructEntity where
-    pp (StructEntity (h:xs) sfs) =
+    pp (StructEntity cname@(h:xs) sfs) =
         let name = ((toUpper h) : xs)
+            fsMount = length sfs
+            argNames = take fsMount $ map (\c->[c]) ['a'..'z']
+            args = concat $ map (' ':) argNames
+            fnames = map fieldName sfs
         in "data "
         ++ name
         ++ " = "
         ++ name
-        ++ "{\n"
-        ++ (tail $ concat $ map ((',':).(++"\n").pp) sfs)
-        ++ "} deriving (Show, Eq)"
+        ++ nline
+        ++ softtab 1 ++ "{ "
+        ++ (drop 3 $ concat $ map (((softtab 1 ++ ", ")++).(++ nline).pp) sfs)
+        ++ softtab 1 ++ "} deriving (Show, Eq)\n"
+        --
+        ++ "instance Storable " ++ name ++ " where"
+        ++ nline
+        ++ softtab 1 ++ "alignment _ = #{alignment " ++ cname ++ "}"
+        ++ nline
+        ++ softtab 1 ++ "sizeOf _    = #{size " ++ cname ++ "}"
+        ++ nline
+        ++ softtab 1 ++ "peek ptr = do"
+        ++ nline
+        ++ pls cname (zip argNames fnames)
+        ++ softtab 2 ++ "return (" ++ cname ++ args ++ ")"
+        ++ nline ++ nline
+
+
+pls :: String -> [(String, String)] -> String
+pls cname ((a,b):xs) =
+    softtab 2
+    ++ (genPeekLine cname a b)
+    ++ nline
+    ++ (pls cname xs)
+pls cname [] = ""
+
+nline :: String
+nline = "\n"
+
+softtab :: Int -> String
+softtab 0 = ""
+softtab n = "    " ++ softtab (n-1)
+
+
+genPeekLine :: String -> String -> String -> String
+genPeekLine cname argName fname =
+    argName ++ " <- #{peek " ++
+    cname ++ ", " ++ fname ++ "} ptr"
+
+
+
+-- instance Storable SpDrawOrderTimeline where
+--     alignment _ = #{alignment spDrawOrderTimeline}
+--     sizeOf _    = #{size      spDrawOrderTimeline}
+--     peek ptr = do
+--         s  <- #{peek spDrawOrderTimeline, super}       ptr
+--         fc <- #{peek spDrawOrderTimeline, framesCount} ptr
+--         fs <- #{peek spDrawOrderTimeline, frames}      ptr
+--         d  <- #{peek spDrawOrderTimeline, drawOrders}  ptr
+--         sc <- #{peek spDrawOrderTimeline, slotsCount}  ptr
+--         return (SpDrawOrderTimeline s fc fs d sc)
+--     poke ptr (SpDrawOrderTimeline s fc fs d sc) = do
+--         #{poke spDrawOrderTimeline, super}           ptr s
+--         #{poke spDrawOrderTimeline, framesCount}     ptr fc
+--         #{poke spDrawOrderTimeline, frames}          ptr fs
+--         #{poke spDrawOrderTimeline, drawOrders}      ptr d
+--         #{poke spDrawOrderTimeline, slotsCount}      ptr sc
+
+
+
 
 instance PP FieldEntity where
     pp (FieldEntity fname fty (Just comm)) =
@@ -80,6 +142,7 @@ pStructEntity = do
     char '{'
     spaces
     sf <- many1 pFieldEntity
+    manyTill anyChar (try $ string $ "} "++sname)
     return (StructEntity sname sf)
 --
 pStructName :: Parsec String st String
@@ -140,3 +203,4 @@ pFTOther = do
     spaces
     return (FTOther tname)
 --
+ss = "typedef struct spPathConstraintSpacingTimeline { spCurveTimeline super; int const framesCount; float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */ int pathConstraintIndex; #ifdef __cplusplus spPathConstraintSpacingTimeline() : super(), framesCount(0), frames(0), pathConstraintIndex(0) { } #endif } spPathConstraintSpacingTimeline;"
