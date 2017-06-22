@@ -5,153 +5,49 @@ import Lib
 import Text.Parsec
 import Data.Char
 import System.Environment (getArgs)
+import System.IO
+import Debug.Trace
 --
 main :: IO ()
-main =
-    getArgs >>=
-    (putStrLn . either show pp . pStruct . rmLn . head)
-
+main = do
+    xs <- getArgs
+    h1 <- openFile (head xs) ReadMode
+    str <- hGetContents h1
+    -- (putStrLn . either show pp . pStruct . rmLn) str
+    putStrLn $ (either show (concat.map pp) . pStructs . rmLn) str
 
 
 rmLn :: String -> String
-rmLn str = filter (/= '\n') str
+rmLn str = map (\x -> if x == '\n' || x == '\t' then ' ' else x) str
+
+
+-- -- -- -- -- -- -- -- -- --
+
+pStructs :: String -> Either ParseError [StructEntity]
+pStructs = parse (many pStructEntity) ""
 
 pStruct :: String -> Either ParseError StructEntity
 pStruct = parse pStructEntity ""
-
-
-
-data StructEntity = StructEntity
-    { sname   :: String
-    , sfields :: [FieldEntity]
-    } deriving (Eq, Show)
---
-data FieldEntity = FieldEntity
-    { fieldName :: String
-    , fieldType :: FTypEntity
-    , fieldComm :: Maybe String
-    } deriving (Eq, Show)
---
-data FTypEntity = FTypEntity
-    { ptrCounter :: Int
-    , typeBody :: FTyp
-    } deriving (Eq, Show)
---
-data FTyp
-    = FTInt
-    | FTFloat
-    | FTVoid
-    | FTOther String
-    deriving (Eq, Show)
---
-class PP a where
-    pp :: a -> String
-instance PP StructEntity where
-    pp (StructEntity cname@(h:xs) sfs) =
-        let name = ((toUpper h) : xs)
-            fsMount = length sfs
-            argNames = take fsMount $ map (\c->[c]) ['a'..'z']
-            args = concat $ map (' ':) argNames
-            fnames = map fieldName sfs
-        in "data "
-        ++ name
-        ++ " = "
-        ++ name
-        ++ nline
-        ++ softtab 1 ++ "{ "
-        ++ (drop 3 $ concat $ map (((softtab 1 ++ ", ")++).(++ nline).pp) sfs)
-        ++ softtab 1 ++ "} deriving (Show, Eq)\n"
-        --
-        ++ "instance Storable " ++ name ++ " where"
-        ++ nline
-        ++ softtab 1 ++ "alignment _ = #{alignment " ++ cname ++ "}"
-        ++ nline
-        ++ softtab 1 ++ "sizeOf _    = #{size " ++ cname ++ "}"
-        ++ nline
-        ++ softtab 1 ++ "peek ptr = do"
-        ++ nline
-        ++ pls cname (zip argNames fnames)
-        ++ softtab 2 ++ "return (" ++ cname ++ args ++ ")"
-        ++ nline ++ nline
-
-
-pls :: String -> [(String, String)] -> String
-pls cname ((a,b):xs) =
-    softtab 2
-    ++ (genPeekLine cname a b)
-    ++ nline
-    ++ (pls cname xs)
-pls cname [] = ""
-
-nline :: String
-nline = "\n"
-
-softtab :: Int -> String
-softtab 0 = ""
-softtab n = "    " ++ softtab (n-1)
-
-
-genPeekLine :: String -> String -> String -> String
-genPeekLine cname argName fname =
-    argName ++ " <- #{peek " ++
-    cname ++ ", " ++ fname ++ "} ptr"
-
-
-
--- instance Storable SpDrawOrderTimeline where
---     alignment _ = #{alignment spDrawOrderTimeline}
---     sizeOf _    = #{size      spDrawOrderTimeline}
---     peek ptr = do
---         s  <- #{peek spDrawOrderTimeline, super}       ptr
---         fc <- #{peek spDrawOrderTimeline, framesCount} ptr
---         fs <- #{peek spDrawOrderTimeline, frames}      ptr
---         d  <- #{peek spDrawOrderTimeline, drawOrders}  ptr
---         sc <- #{peek spDrawOrderTimeline, slotsCount}  ptr
---         return (SpDrawOrderTimeline s fc fs d sc)
---     poke ptr (SpDrawOrderTimeline s fc fs d sc) = do
---         #{poke spDrawOrderTimeline, super}           ptr s
---         #{poke spDrawOrderTimeline, framesCount}     ptr fc
---         #{poke spDrawOrderTimeline, frames}          ptr fs
---         #{poke spDrawOrderTimeline, drawOrders}      ptr d
---         #{poke spDrawOrderTimeline, slotsCount}      ptr sc
-
-
-
-
-instance PP FieldEntity where
-    pp (FieldEntity fname fty (Just comm)) =
-        pp (FieldEntity fname fty Nothing) ++
-        " -- ^ " ++ comm
-    pp (FieldEntity fname fty Nothing) =
-        fname ++ " :: " ++ (pp fty)
-instance PP FTypEntity where
-    pp (FTypEntity 0 ty) = pp ty
-    pp (FTypEntity n ty) =
-        "Ptr ( " ++ (pp (FTypEntity (n-1) ty)) ++ " )"
-instance PP FTyp where
-    pp FTInt   = "CInt"
-    pp FTFloat = "CFloat"
-    pp FTVoid  = "()"
-    pp (FTOther (h:xs)) = (toUpper h) : xs
 --
 pStructEntity :: Parsec String st StructEntity
 pStructEntity = do
     spaces
     sname <- pStructName
     spaces
-    char '{'
-    spaces
     sf <- many1 pFieldEntity
-    manyTill anyChar (try $ string $ "} "++sname)
+    manyTill anyChar (try $ choice [string ("} "++sname++";"), string "};"])
     return (StructEntity sname sf)
 --
 pStructName :: Parsec String st String
 pStructName = do
-    string "typedef"
+    optional (string "typedef")
     spaces
     string "struct"
     spaces
-    many letter
+    s <- many letter
+    spaces
+    string "{"
+    return s
 --
 pFieldEntity :: Parsec String st FieldEntity
 pFieldEntity = do
@@ -202,5 +98,132 @@ pFTOther = do
     tname <- (many1 letter)
     spaces
     return (FTOther tname)
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+data StructEntity = StructEntity
+    { sname   :: String
+    , sfields :: [FieldEntity]
+    } deriving (Eq, Show)
 --
-ss = "typedef struct spPathConstraintSpacingTimeline { spCurveTimeline super; int const framesCount; float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */ int pathConstraintIndex; #ifdef __cplusplus spPathConstraintSpacingTimeline() : super(), framesCount(0), frames(0), pathConstraintIndex(0) { } #endif } spPathConstraintSpacingTimeline;"
+data FieldEntity = FieldEntity
+    { fieldName :: String
+    , fieldType :: FTypEntity
+    , fieldComm :: Maybe String
+    } deriving (Eq, Show)
+--
+data FTypEntity = FTypEntity
+    { ptrCounter :: Int
+    , typeBody :: FTyp
+    } deriving (Eq, Show)
+--
+data FTyp
+    = FTInt
+    | FTFloat
+    | FTVoid
+    | FTOther String
+    deriving (Eq, Show)
+--
+class PP a where
+    pp :: a -> String
+--
+instance PP StructEntity where
+    pp (StructEntity structName sfs) =
+        let fsMount = length sfs
+            argNames = take fsMount $ map (\c->[c]) ['a'..'z']
+            fnames = map fieldName sfs
+        in "data "
+        ++ upHead structName
+        ++ " = "
+        ++ upHead structName
+        ++ nline
+        ++ softtab 1 ++ "{ "
+        ++  ( drop 6
+            $ concat
+            $ map (((softtab 1 ++ ", ")++).(++ nline).pp)
+            sfs)
+        ++ softtab 1 ++ "} deriving (Show, Eq)\n"
+        ++ printStorable structName argNames fnames
+instance PP FieldEntity where
+    pp (FieldEntity fname fty (Just comm)) =
+        pp (FieldEntity fname fty Nothing) ++
+        " -- ^ " ++ comm
+    pp (FieldEntity fname fty Nothing) =
+        fname ++ " :: " ++ (pp fty)
+instance PP FTypEntity where
+    pp (FTypEntity 0 ty) = pp ty
+    pp (FTypEntity n ty) =
+        "Ptr ( " ++ (pp (FTypEntity (n-1) ty)) ++ " )"
+instance PP FTyp where
+    pp FTInt   = "CInt"
+    pp FTFloat = "CFloat"
+    pp FTVoid  = "()"
+    pp (FTOther (h:xs)) = (toUpper h) : xs
+--
+printStorable :: String -> [String] -> [String] -> String
+printStorable name args fields =
+    "instance Storable " ++ upHead name ++ " where"
+    ++ nline
+    ++ softtab 1
+    ++ "alignment _ = #{alignment " ++ name ++ "}"
+    ++ nline
+    ++ softtab 1
+    ++ "sizeOf _    = #{size " ++ name ++ "}"
+    ++ nline
+    ++ softtab 1
+    ++ printPeek name args fields
+    ++ nline
+    ++ softtab 1
+    ++ printPoke name args fields
+--
+printPeek :: String -> [String] -> [String] -> String
+printPeek name args fields =
+    "peek ptr = do"
+    ++ nline
+    ++ ppeekline name (zip args fields)
+    ++ softtab 2
+    ++ "return ("
+    ++ upHead name ++ (concat $ map (' ':) args)
+    ++ ")"
+--
+printPoke :: String -> [String] -> [String] -> String
+printPoke name args fields =
+    "poke ptr ("
+    ++ upHead name ++ (concat $ map (' ':) args)
+    ++ ") = do"
+    ++ nline
+    ++ ppokeline name (zip args fields)
+--
+ppeekline :: String -> [(String, String)] -> String
+ppeekline cname ((a,b):xs) =
+    softtab 2
+    ++ (genPeekLine cname a b)
+    ++ nline
+    ++ (ppeekline cname xs)
+ppeekline cname [] = ""
+--
+ppokeline :: String -> [(String, String)] -> String
+ppokeline cname ((a,b):xs) =
+    softtab 2
+    ++ (genPokeLine cname a b)
+    ++ nline
+    ++ (ppokeline cname xs)
+ppokeline cname [] = ""
+--
+genPokeLine :: String -> String -> String -> String
+genPokeLine cname argName fname =
+    "#{poke " ++ cname ++ ", " ++
+    fname ++ "} ptr " ++ argName
+--
+genPeekLine :: String -> String -> String -> String
+genPeekLine cname argName fname =
+    argName ++ " <- #{peek " ++
+    cname ++ ", " ++ fname ++ "} ptr"
+--
+nline :: String
+nline = "\n"
+--
+softtab :: Int -> String
+softtab 0 = ""
+softtab n = "    " ++ softtab (n-1)
+--
+upHead :: String -> String
+upHead (x:xs) = toUpper x : xs
