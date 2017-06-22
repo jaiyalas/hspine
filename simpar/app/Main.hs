@@ -13,13 +13,13 @@ main = do
     xs <- getArgs
     h1 <- openFile (head xs) ReadMode
     str <- hGetContents h1
+    (putStrLn . either show pp . pStructs . rmLn) str
     -- (putStrLn . either show pp . pStruct . rmLn) str
-    putStrLn $ (either show (concat.map pp) . pStructs . rmLn) str
+    -- putStrLn $ show $ pStructs $ rmLn str
 
 
 rmLn :: String -> String
 rmLn str = map (\x -> if x == '\n' || x == '\t' then ' ' else x) str
-
 
 -- -- -- -- -- -- -- -- -- --
 
@@ -36,11 +36,13 @@ pStructEntity = do
     spaces
     sf <- many1 pFieldEntity
     manyTill anyChar (try $ choice [string ("} "++sname++";"), string "};"])
+    spaces
     return (StructEntity sname sf)
 --
 pStructName :: Parsec String st String
 pStructName = do
-    optional (string "typedef")
+    -- optional (string "typedef")
+    string "typedef"
     spaces
     string "struct"
     spaces
@@ -125,6 +127,9 @@ data FTyp
 class PP a where
     pp :: a -> String
 --
+instance PP a => PP [a] where
+    pp [] = ""
+    pp (x:xs) = (pp x) ++ nline ++ (pp xs)
 instance PP StructEntity where
     pp (StructEntity structName sfs) =
         let fsMount = length sfs
@@ -140,7 +145,7 @@ instance PP StructEntity where
             $ concat
             $ map (((softtab 1 ++ ", ")++).(++ nline).pp)
             sfs)
-        ++ softtab 1 ++ "} deriving (Show, Eq)\n"
+        ++ softtab 1 ++ "} deriving (Show, Eq)"
         ++ printStorable structName argNames fnames
 instance PP FieldEntity where
     pp (FieldEntity fname fty (Just comm)) =
