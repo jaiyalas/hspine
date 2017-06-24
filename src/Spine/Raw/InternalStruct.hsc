@@ -1,5 +1,5 @@
 module Spine.Raw.InternalStruct(
-    -- * "spine/Animation"
+    -- * spine/Animation
       data SpAnimation(..)
     , data SpTimeline(..)
     , data SpCurveTimeline(..)
@@ -14,8 +14,10 @@ module Spine.Raw.InternalStruct(
     , data SpPathConstraintPositionTimeline(..)
     , data SpPathConstraintSpacingTimeline(..)
     , data SpPathConstraintMixTimeline(..)
-    -- *
-    )where
+    -- * spine/AnimationState
+    , data SpTrackEntry(..)
+    , data SpAnimationState(..)
+    ) where
 --
 #include "spine/Animation.h"
 #include "spine/AnimationState.h"
@@ -61,7 +63,9 @@ import Spine.Raw.InternalEnum
 #endif
 --
 
+-- #####################
 --  "spine/Animation"
+-- #####################
 
 -- | SpAnimation
 data SpAnimation = SpAnimation
@@ -138,6 +142,18 @@ instance Storable SpBaseTimeline where
         #{poke spBaseTimeline, framesCount} ptr b
         #{poke spBaseTimeline, frames} ptr c
         #{poke spBaseTimeline, boneIndex} ptr d
+
+-- | SpRotateTimeline
+type SpRotateTimeline    = SpBaseTimeline
+
+-- | SpTranslateTimeline
+type SpTranslateTimeline = SpBaseTimeline
+
+-- | SpScaleTimeline
+type SpScaleTimeline     = SpBaseTimeline
+
+-- | SpShearTimeline
+type SpShearTimeline     = SpBaseTimeline
 
 -- | SpColorTimeline
 data SpColorTimeline = SpColorTimeline
@@ -374,16 +390,156 @@ instance Storable SpPathConstraintMixTimeline where
         #{poke spPathConstraintMixTimeline, frames} ptr c
         #{poke spPathConstraintMixTimeline, pathConstraintIndex} ptr d
 
-
-
+-- #####################
 --  "spine/AnimationState"
+-- #####################
+
+-- | SpTrackEntry
+data SpTrackEntry = SpTrackEntry
+    { animation :: Ptr SpAnimation
+    , next :: Ptr SpTrackEntry
+    , mixingFrom :: Ptr SpTrackEntry
+    , listener :: SpAnimationStateListener
+    , trackIndex :: CInt
+    , loop :: CInt -- ^ boolean
+    , eventThreshold :: CFloat
+    , attachmentThreshold :: CFloat
+    , drawOrderThreshold :: CFloat
+    , animationStart :: CFloat
+    , animationEnd :: CFloat
+    , animationLast :: CFloat
+    , nextAnimationLast :: CFloat
+    , delay :: CFloat
+    , trackTime :: CFloat
+    , trackLast :: CFloat
+    , nextTrackLast :: CFloat
+    , trackEnd :: CFloat
+    , timeScale :: CFloat
+    , alpha :: CFloat
+    , mixTime :: CFloat
+    , mixDuration :: CFloat
+    , mixAlpha :: CFloat
+    , timelinesFirst :: Ptr CInt -- ^ boolean
+    , timelinesFirstCount :: CInt
+    , timelinesRotation :: Ptr CFloat
+    , timelinesRotationCount :: CInt
+    , rendererObject :: Ptr ()
+    , userData :: Ptr ()
+    } deriving (Show, Eq)
+instance Storable SpTrackEntry where
+    alignment _ = #{alignment spTrackEntry}
+    sizeOf _    = #{size spTrackEntry}
+    peek ptr = do
+        a <- #{peek spTrackEntry, animation} ptr
+        b <- #{peek spTrackEntry, next} ptr
+        c <- #{peek spTrackEntry, mixingFrom} ptr
+        d <- #{peek spTrackEntry, listener} ptr
+        e <- #{peek spTrackEntry, trackIndex} ptr
+        f <- #{peek spTrackEntry, loop} ptr
+        g <- #{peek spTrackEntry, eventThreshold} ptr
+        h <- #{peek spTrackEntry, attachmentThreshold} ptr
+        i <- #{peek spTrackEntry, drawOrderThreshold} ptr
+        j <- #{peek spTrackEntry, animationStart} ptr
+        k <- #{peek spTrackEntry, animationEnd} ptr
+        l <- #{peek spTrackEntry, animationLast} ptr
+        m <- #{peek spTrackEntry, nextAnimationLast} ptr
+        n <- #{peek spTrackEntry, delay} ptr
+        o <- #{peek spTrackEntry, trackTime} ptr
+        p <- #{peek spTrackEntry, trackLast} ptr
+        q <- #{peek spTrackEntry, nextTrackLast} ptr
+        r <- #{peek spTrackEntry, trackEnd} ptr
+        s <- #{peek spTrackEntry, timeScale} ptr
+        t <- #{peek spTrackEntry, alpha} ptr
+        u <- #{peek spTrackEntry, mixTime} ptr
+        v <- #{peek spTrackEntry, mixDuration} ptr
+        w <- #{peek spTrackEntry, mixAlpha} ptr
+        x <- #{peek spTrackEntry, timelinesFirst} ptr
+        y <- #{peek spTrackEntry, timelinesFirstCount} ptr
+        z <- #{peek spTrackEntry, timelinesRotation} ptr
+        return (SpTrackEntry a b c d e f g h i j k l m n o p q r s t u v w x y z)
+    poke ptr (SpTrackEntry a b c d e f g h i j k l m n o p q r s t u v w x y z) = do
+        #{poke spTrackEntry, animation} ptr a
+        #{poke spTrackEntry, next} ptr b
+        #{poke spTrackEntry, mixingFrom} ptr c
+        #{poke spTrackEntry, listener} ptr d
+        #{poke spTrackEntry, trackIndex} ptr e
+        #{poke spTrackEntry, loop} ptr f
+        #{poke spTrackEntry, eventThreshold} ptr g
+        #{poke spTrackEntry, attachmentThreshold} ptr h
+        #{poke spTrackEntry, drawOrderThreshold} ptr i
+        #{poke spTrackEntry, animationStart} ptr j
+        #{poke spTrackEntry, animationEnd} ptr k
+        #{poke spTrackEntry, animationLast} ptr l
+        #{poke spTrackEntry, nextAnimationLast} ptr m
+        #{poke spTrackEntry, delay} ptr n
+        #{poke spTrackEntry, trackTime} ptr o
+        #{poke spTrackEntry, trackLast} ptr p
+        #{poke spTrackEntry, nextTrackLast} ptr q
+        #{poke spTrackEntry, trackEnd} ptr r
+        #{poke spTrackEntry, timeScale} ptr s
+        #{poke spTrackEntry, alpha} ptr t
+        #{poke spTrackEntry, mixTime} ptr u
+        #{poke spTrackEntry, mixDuration} ptr v
+        #{poke spTrackEntry, mixAlpha} ptr w
+        #{poke spTrackEntry, timelinesFirst} ptr x
+        #{poke spTrackEntry, timelinesFirstCount} ptr y
+        #{poke spTrackEntry, timelinesRotation} ptr z
+
+-- | SpAnimationState
+data SpAnimationState = SpAnimationState
+    { data :: Ptr SpAnimationStateData
+    , tracksCount :: CInt
+    , tracks :: Ptr ( Ptr SpTrackEntry )
+    , listener :: SpAnimationStateListener
+    , timeScale :: CFloat
+    , rendererObject :: Ptr ()
+    } deriving (Show, Eq)
+instance Storable SpAnimationState where
+    alignment _ = #{alignment spAnimationState}
+    sizeOf _    = #{size spAnimationState}
+    peek ptr = do
+        a <- #{peek spAnimationState, data} ptr
+        b <- #{peek spAnimationState, tracksCount} ptr
+        c <- #{peek spAnimationState, tracks} ptr
+        d <- #{peek spAnimationState, listener} ptr
+        e <- #{peek spAnimationState, timeScale} ptr
+        f <- #{peek spAnimationState, rendererObject} ptr
+        return (SpAnimationState a b c d e f)
+    poke ptr (SpAnimationState a b c d e f) = do
+        #{poke spAnimationState, data} ptr a
+        #{poke spAnimationState, tracksCount} ptr b
+        #{poke spAnimationState, tracks} ptr c
+        #{poke spAnimationState, listener} ptr d
+        #{poke spAnimationState, timeScale} ptr e
+        #{poke spAnimationState, rendererObject} ptr f
+
+
 --  "spine/AnimationStateData"
+
+
+
 --  "spine/Atlas"
+
+
+
 --  "spine/AtlasAttachmentLoader"
+
+
+
 --  "spine/Attachment"
+
+
+
 --  "spine/AttachmentLoader"
+
+
+
 --  "spine/Bone"
+
+
+
 --  "spine/BoneData"
+
 data SpBoneData = SpBoneData
     { spBoneData_index    :: CInt
     , spBoneData_name     :: CString
@@ -432,24 +588,87 @@ instance Default SpBoneData where
     def = SpBoneData 0 nullPtr nullPtr 0 0 0 0 0 0 0 0 TRANSFORMMODE_NORMAL
 
 -- "spine/BoneData.h"
+
+
+
 -- "spine/BoundingBoxAttachment.h"
+
+
+
 -- "spine/Event.h"
+
+
+
 -- "spine/EventData.h"
+
+
+
 -- "spine/IkConstraint.h"
+
+
+
 -- "spine/IkConstraintData.h"
+
+
+
 -- "spine/MeshAttachment.h"
+
+
+
 -- "spine/PathAttachment.h"
+
+
+
 -- "spine/PathConstraint.h"
+
+
+
 -- "spine/PathConstraintData.h"
+
+
+
 -- "spine/RegionAttachment.h"
+
+
+
 -- "spine/Skeleton.h"
+
+
+
 -- "spine/SkeletonBinary.h"
+
+
+
 -- "spine/SkeletonBounds.h"
+
+
+
 -- "spine/SkeletonData.h"
+
+
+
 -- "spine/SkeletonJson.h"
+
+
+
 -- "spine/Skin.h"
+
+
+
 -- "spine/Slot.h"
+
+
+
 -- "spine/SlotData.h"
+
+
+
 -- "spine/TransformConstraint.h"
+
+
+
 -- "spine/TransformConstraintData.h"
+
+
+
 -- "spine/VertexAttachment.h"
