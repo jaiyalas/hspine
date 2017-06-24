@@ -12,11 +12,24 @@ main :: IO ()
 main = do
     xs <- getArgs
     h1 <- openFile (head xs) ReadMode
+    h2 <- openFile "output.hsc" WriteMode
     str <- hGetContents h1
-    (putStrLn . either show pp . pStructs . rmLn) str
+    let parsed = pStructs $ rmLn str
+    hPutStr h2 $ either show pp parsed
+    hPutStr h2 $ either show pm parsed
+    hClose h1
+    hClose h2
     -- (putStrLn . either show pp . pStruct . rmLn) str
     -- putStrLn $ show $ pStructs $ rmLn str
 
+pm :: [StructEntity] -> String
+pm [] = ""
+pm (x:xs) = softtab 1
+    ++ ", data "
+    ++ upHead (sname x)
+    ++ "(..)"
+    ++ nline
+    ++ pm xs
 
 rmLn :: String -> String
 rmLn str = map (\x -> if x == '\n' || x == '\t' then ' ' else x) str
@@ -35,14 +48,14 @@ pStructEntity = do
     sname <- pStructName
     spaces
     sf <- many1 pFieldEntity
-    manyTill anyChar (try $ choice [string ("} "++sname++";"), string "};"])
+    manyTill anyChar (try $ do{ char '}'; spaces; optional (string sname); char ';' })
     spaces
     return (StructEntity sname sf)
 --
 pStructName :: Parsec String st String
 pStructName = do
-    -- optional (string "typedef")
-    string "typedef"
+    optional (string "typedef")
+    -- string "typedef"
     spaces
     string "struct"
     spaces
@@ -54,17 +67,19 @@ pStructName = do
 pFieldEntity :: Parsec String st FieldEntity
 pFieldEntity = do
     spaces
-    _ <- optionMaybe (string "const")
+    optional (try $ string "const")
     spaces
     ty <- pFTypEntity
     spaces
-    _ <- optionMaybe (string "const")
+    optional (try $ string "const")
     spaces
     name <- (many1 letter)
     spaces
     char ';'
     spaces
     mcomm <- optionMaybe pComm
+    -- traceShow "mcomm" spaces
+    -- traceShow mcomm spaces
     spaces
     return $ FieldEntity name ty mcomm
 --
@@ -80,7 +95,7 @@ pFTypEntity :: Parsec String st FTypEntity
 pFTypEntity = do
     p1 <- many (char '*')
     spaces
-    t <- choice [pFTInt, pFTFloat, pFTVoid, pFTOther]
+    t <- choice [pFTInt, pFTFloat, pFTVoid, pFTChars, pFTOther]
     spaces
     p2 <- many (char '*')
     return $ FTypEntity (length p1 + length p2) t
@@ -93,6 +108,8 @@ pFTFloat = string "float" >> return FTFloat
 --
 pFTVoid :: Parsec String st FTyp
 pFTVoid = string "void" >> return FTVoid
+pFTChars :: Parsec String st FTyp
+pFTChars = string "char*" >> return FTChars
 --
 pFTOther :: Parsec String st FTyp
 pFTOther = do
@@ -121,6 +138,7 @@ data FTyp
     = FTInt
     | FTFloat
     | FTVoid
+    | FTChars
     | FTOther String
     deriving (Eq, Show)
 --
@@ -135,7 +153,10 @@ instance PP StructEntity where
         let fsMount = length sfs
             argNames = take fsMount $ map (\c->[c]) ['a'..'z']
             fnames = map fieldName sfs
-        in "data "
+        in "-- | "
+        ++ upHead structName
+        ++ nline
+        ++ "data "
         ++ upHead structName
         ++ " = "
         ++ upHead structName
@@ -146,6 +167,7 @@ instance PP StructEntity where
             $ map (((softtab 1 ++ ", ")++).(++ nline).pp)
             sfs)
         ++ softtab 1 ++ "} deriving (Show, Eq)"
+        ++ nline
         ++ printStorable structName argNames fnames
 instance PP FieldEntity where
     pp (FieldEntity fname fty (Just comm)) =
@@ -155,11 +177,13 @@ instance PP FieldEntity where
         fname ++ " :: " ++ (pp fty)
 instance PP FTypEntity where
     pp (FTypEntity 0 ty) = pp ty
+    pp (FTypEntity 1 ty) = "Ptr " ++ pp ty
     pp (FTypEntity n ty) =
         "Ptr ( " ++ (pp (FTypEntity (n-1) ty)) ++ " )"
 instance PP FTyp where
     pp FTInt   = "CInt"
     pp FTFloat = "CFloat"
+    pp FTChars  = "CString"
     pp FTVoid  = "()"
     pp (FTOther (h:xs)) = (toUpper h) : xs
 --
