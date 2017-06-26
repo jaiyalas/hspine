@@ -85,9 +85,11 @@ pFieldEntity = do
 --
 pComm :: Parsec String st String
 pComm = do
-    choice [string "/* ", string "/*"]
+    string "/*"
+    optional space
     spaces
-    s <- manyTill anyChar (try (choice [string " */", string "*/"]))
+    s <- manyTill anyChar (try
+        (optional spaces >> string "*/"))
     spaces
     return s
 --
@@ -100,6 +102,8 @@ pFTypEntity = do
     p2 <- many (char '*')
     return $ FTypEntity (length p1 + length p2) t
 --
+
+
 pFTInt :: Parsec String st FTyp
 pFTInt = string "int" >> return FTInt
 --
@@ -117,7 +121,27 @@ pFTOther = do
     tname <- (many1 letter)
     spaces
     return (FTOther tname)
+
+pFunctionEntity :: Parsec String st FunctionEntity
+pFunctionEntity = do
+    mcomm <- optionMaybe pComm
+    spaces
+    ret <- pFTypEntity
+    spaces
+    fname <- many1 $ choice [letter, char '_']
+    spaces
+    argts <- between (char '(') (string ");") (many1 (do{x<-pFTypEntity;spaces;optional (char ',');spaces;return x}))
+    spaces
+    return (FunctionEntity fname ret argts mcomm)
+
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+data FunctionEntity = FunctionEntity
+    { fname :: String
+    , rttype :: FTypEntity
+    , argTypes :: [FTypEntity]
+    , fcomm :: Maybe String
+    } deriving (Show, Eq)
 data StructEntity = StructEntity
     { sname   :: String
     , sfields :: [FieldEntity]
