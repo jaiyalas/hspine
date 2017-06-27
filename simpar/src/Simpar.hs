@@ -1,5 +1,7 @@
 module Simpar where
 --
+import Text.Parsec
+--
 import Simpar.Types
 import Simpar.Print
 --
@@ -24,11 +26,11 @@ parseFTypEntity = do
     p1 <- many (char '*')
     parseConst
     spaces
-    t <- choice [ try pFTInt
-                , try pFTFloat
-                , try pFTVoid
-                , try pFTChars
-                , try pFTOther ]
+    t <- choice [ try parseFTInt
+                , try parseFTFloat
+                , try parseFTVoid
+                , try parseFTChars
+                , try parseFTOther ]
     spaces
     parseConst
     p2 <- many (char '*')
@@ -36,7 +38,10 @@ parseFTypEntity = do
     return $ FTypEntity (length p1 + length p2) t
 --
 parseConst :: Parsec String st ()
-parseConst = spaces >> optional (string "const") >> spaces >> return ()
+parseConst = spaces
+    >> optional (try $ string "const")
+    >> spaces
+    >> return ()
 --
 parseComm :: Parsec String st String
 parseComm = do
@@ -45,3 +50,65 @@ parseComm = do
     s <- manyTill anyChar (try (spaces >> string "*/"))
     spaces
     return s
+--
+parseFieldEntity :: Parsec String st FieldEntity
+parseFieldEntity = do
+    ty <- parseFTypEntity
+    spaces
+    name <- (many1 letter)
+    spaces
+    char ';'
+    spaces
+    mcomm <- optionMaybe parseComm
+    return $ FieldEntity name ty mcomm
+--
+parseStructName :: Parsec String st String
+parseStructName = do
+    optional (string "typedef")
+    spaces
+    string "struct"
+    spaces
+    s <- many letter
+    return s
+--
+parseStructEntity :: Parsec String st StructEntity
+parseStructEntity = do
+    sname <- parseStructName
+    spaces
+    string "{"
+    spaces
+    sf <- many1 parseFieldEntity
+    manyTill anyChar (try $ parseFieldClose sname)
+    return (StructEntity sname sf)
+--
+parseFieldClose :: String -> Parsec String st ()
+parseFieldClose sname =
+    char '}'
+    >> spaces
+    >> optional (string sname)
+    >> char ';'
+    >> (return ())
+--
+parseFunctionEntity :: Parsec String st FunctionEntity
+parseFunctionEntity = do
+    mcomm <- optionMaybe parseComm
+    spaces
+    ret <- parseFTypEntity
+    spaces
+    fname <- many1 $ choice [letter, char '_']
+    spaces
+    char '('
+    spaces
+    argts <- sepBy parseArgEntity (spaces >> char ',' >> spaces)
+    string ");"
+    spaces
+    return (FunctionEntity fname ret argts mcomm)
+--
+parseArgEntity :: Parsec String st ArgEntity
+parseArgEntity = do
+    spaces
+    ty <- parseFTypEntity
+    spaces
+    tname <- many1 $ choice [alphaNum, char '_']
+    spaces
+    return (ArgEntity tname ty)

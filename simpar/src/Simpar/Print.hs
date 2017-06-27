@@ -1,8 +1,20 @@
-module Simpar where
+module Simpar.Print
+    ( -- * PrintHsc
+      PrintHsc(..)
+    , printStorable
+    -- * auxiliary functions
+    , nline
+    , softtab
+    , upHead
+    ) where
 --
 import Simpar.Types
 --
+import Text.Parsec
+import Data.Char (toUpper)
+--
 class PrintHsc a where
+    -- | print string for .hsc
     printHsc :: a -> String
 --
 instance PrintHsc a => PrintHsc [a] where
@@ -45,16 +57,29 @@ instance PrintHsc FTyp where
     printHsc FTFloat = "CFloat"
     printHsc FTChars  = "CString"
     printHsc FTVoid  = "()"
-    printHsc (FTOther (x : xs)) = (toUprintHscer x) : xs
+    printHsc (FTOther (x : xs)) = (toUpper x) : xs
+--
+instance PrintHsc ArgEntity where
+    printHsc (ArgEntity aname aty) =
+        printHsc aty
+        ++ " -- ^ "
+        ++ aname
 --
 instance PrintHsc FunctionEntity where
-    printHsc (FunctionEntity fname rttype argTypes fcomm) =
+    printHsc (FunctionEntity fname rttype argTypes (Just comm)) =
+        "-- | "
+        ++ comm
+        ++ nline
+        ++ (printHsc $ FunctionEntity fname rttype argTypes Nothing)
+    printHsc (FunctionEntity fname rttype argTypes Nothing) =
         "foreign import ccall \"" ++ fname ++"\" "
         ++fname ++"_FFI"
         ++ nline ++ softtab 1 ++ ":: "
-        ++ concat (map (++(nline ++ softtab 1 ++ "-> ").printHsc) argTypes)
+        ++ concat (map ((++ nline ++ softtab 1 ++ "-> ").printHsc) argTypes)
+        ++ "IO "
         ++ printHsc rttype
 --
+-- | Generate a string of storable instance. Required by the instance `PrintHsc StructEntity`
 printStorable :: String -> [String] -> [String] -> String
 printStorable name args fields =
     "instance Storable " ++ upHead name ++ " where"
@@ -71,6 +96,7 @@ printStorable name args fields =
     ++ softtab 1
     ++ printPoke name args fields
 --
+-- | Generate a string of peek function required within storable instance
 printPeek :: String -> [String] -> [String] -> String
 printPeek name args fields =
     "peek ptr = do"
@@ -81,6 +107,7 @@ printPeek name args fields =
     ++ upHead name ++ (concat $ map (' ':) args)
     ++ ")"
 --
+-- | Generate a string of poke function required within storable instance
 printPoke :: String -> [String] -> [String] -> String
 printPoke name args fields =
     "poke ptr ("
@@ -115,12 +142,16 @@ genPokeLine cname argName fname =
     "#{poke " ++ cname ++ ", " ++
     fname ++ "} ptr " ++ argName
 --
+-- | new line, equals to "\n"
 nline :: String
 nline = "\n"
 --
-softtab :: Int -> String
+-- | tab replacement (as 4 spaces)
+softtab :: Int -- ^ numbers of required tabs
+        -> String
 softtab 0 = ""
 softtab n = "    " ++ softtab (n-1)
 --
+-- | capitalize the first char of given string
 upHead :: String -> String
 upHead (x:xs) = toUpper x : xs
