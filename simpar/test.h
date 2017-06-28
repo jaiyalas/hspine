@@ -36,8 +36,6 @@ typedef struct spBaseTimeline {
 #endif
 } spBaseTimeline;
 
-typedef struct spBaseTimeline spRotateTimeline;
-
 spRotateTimeline* spRotateTimeline_create (int framesCount);
 
 void spRotateTimeline_setFrame (spRotateTimeline* self, int frameIndex, float time, float angle);
