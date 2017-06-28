@@ -78,6 +78,7 @@ instance PrintHsc FunctionEntity where
         ++ concat (map ((++ nline ++ softtab 1 ++ "-> ").printHsc) argTypes)
         ++ "IO "
         ++ printHsc rttype
+        ++ nline
 --
 -- | Generate a string of storable instance. Required by the instance `PrintHsc StructEntity`
 printStorable :: String -> [String] -> [String] -> String
