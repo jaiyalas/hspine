@@ -1,7 +1,62 @@
-module Spine.Raw.Animation
-    (
-    -- * ...
-      pattern ROTATE_PREV_TIME
+module Spine.Raw.Animation (
+    -- * Functions
+    -- ** SpAnimation
+      SpAnimation_create
+    , SpAnimation_dispose
+    , SpAnimation_apply
+    -- ** SpTimeline
+    , SpTimeline_dispose
+    , SpTimeline_apply
+    , SpTimeline_getPropertyId
+    -- ** SpCurveTimeline
+    , SpCurveTimeline_setLinear
+    , SpCurveTimeline_setStepped
+    , SpCurveTimeline_setCurve
+    , SpCurveTimeline_getCurvePercent
+    -- ** SpRotateTimeline
+    , SpRotateTimeline_create
+    , SpRotateTimeline_setFrame
+    -- ** SpTranslateTimeline
+    , SpTranslateTimeline_create
+    , SpTranslateTimeline_setFrame
+    -- ** SpScaleTimeline
+    , SpScaleTimeline_create
+    , SpScaleTimeline_setFrame
+    -- ** SpShearTimeline
+    , SpShearTimeline_create
+    , SpShearTimeline_setFrame
+    -- ** SpColorTimeline
+    , SpColorTimeline_create
+    , SpColorTimeline_setFrame
+    -- ** SpAttachmentTimeline
+    , SpAttachmentTimeline_create
+    , SpAttachmentTimeline_setFrame
+    -- ** SpEventTimeline
+    , SpEventTimeline_create
+    , SpEventTimeline_setFrame
+    -- ** SpDrawOrderTimeline
+    , SpDrawOrderTimeline_create
+    , SpDrawOrderTimeline_setFrame
+    -- ** SpDeformTimeline
+    , SpDeformTimeline_create
+    , SpDeformTimeline_setFrame
+    -- ** SpIkConstraintTimeline
+    , SpIkConstraintTimeline_create
+    , SpIkConstraintTimeline_setFrame
+    -- ** SpTransformConstraintTimeline
+    , SpTransformConstraintTimeline_create
+    , SpTransformConstraintTimeline_setFrame
+    -- ** SpPathConstraintPositionTimeline
+    , SpPathConstraintPositionTimeline_create
+    , SpPathConstraintPositionTimeline_setFrame
+    -- ** SpPathConstraintSpacingTimeline
+    , SpPathConstraintSpacingTimeline_create
+    , SpPathConstraintSpacingTimeline_setFrame
+    -- ** SpPathConstraintMixTimeline
+    , SpPathConstraintMixTimeline_create
+    , SpPathConstraintMixTimeline_setFrame
+    -- * Constants
+    , pattern ROTATE_PREV_TIME
     , pattern ROTATE_PREV_ROTATION
     , pattern ROTATE_ROTATION
     , pattern ROTATE_ENTRIES
@@ -12,478 +67,67 @@ module Spine.Raw.Animation
     , pattern PATHCONSTRAINTPOSITION_ENTRIES
     , pattern PATHCONSTRAINTSPACING_ENTRIES
     , pattern PATHCONSTRAINTMIX_ENTRIES
-    )where
+    ) where
 --
 #include "spine/Animation.h"
 --
--- import Foreign.C.Types
+import Foreign.C.Types
 --
 
- /*boolean*/
-
-# spAnimation_apply args bool
-# spTimeline_apply
-
-typedef enum {
-	SP_TIMELINE_ROTATE,
-	SP_TIMELINE_TRANSLATE,
-	SP_TIMELINE_SCALE,
-	SP_TIMELINE_SHEAR,
-	SP_TIMELINE_ATTACHMENT,
-	SP_TIMELINE_COLOR,
-	SP_TIMELINE_DEFORM,
-	SP_TIMELINE_EVENT,
-	SP_TIMELINE_DRAWORDER,
-	SP_TIMELINE_IKCONSTRAINT,
-	SP_TIMELINE_TRANSFORMCONSTRAINT,
-	SP_TIMELINE_PATHCONSTRAINTPOSITION,
-	SP_TIMELINE_PATHCONSTRAINTSPACING,
-	SP_TIMELINE_PATHCONSTRAINTMIX
-} spTimelineType;
-
-static const int ROTATE_PREV_TIME = -2
-static const int ROTATE_PREV_ROTATION = -1;
-static const int ROTATE_ROTATION = 1;
-static const int ROTATE_ENTRIES = 2;
-static const int TRANSLATE_ENTRIES = 3;
-static const int COLOR_ENTRIES = 5;
-static const int IKCONSTRAINT_ENTRIES = 3;
-static const int TRANSFORMCONSTRAINT_ENTRIES = 5;
-static const int PATHCONSTRAINTPOSITION_ENTRIES = 2;
-static const int PATHCONSTRAINTSPACING_ENTRIES = 2;
-static const int PATHCONSTRAINTMIX_ENTRIES = 3;
-
-typedef struct spBaseTimeline spShearTimeline;
-typedef struct spBaseTimeline spScaleTimeline;
-typedef struct spBaseTimeline spTranslateTimeline;
-typedef struct spBaseTimeline spRotateTimeline;
-
-
--- | SpAnimation
-data SpAnimation = SpAnimation
-    { spAnimation_name :: CString
-    , spAnimation_duration :: CFloat
-    , spAnimation_timelinesCount :: CInt
-    , spAnimation_timelines :: Ptr (Ptr SpTimeline)
-    } deriving (Show, Eq)
-instance Storable SpAnimation where
-    alignment _ = #{alignment spAnimation}
-    sizeOf _ = #{size spAnimation}
-    peek ptr = do
-        n  <- #{peek spBoneData, name} ptr
-        d  <- #{peek spBoneData, duration} ptr
-        t  <- #{peek spBoneData, timelinesCount} ptr
-        ts <- #{peek spBoneData, timelines} ptr
-        return (SpAnimation n d t ts)
-    poke ptr (SpAnimation n d t ts) = do
-        #{poke spBoneData, name} ptr n
-        #{poke spBoneData, duration} ptr d
-        #{poke spBoneData, timelinesCount} ptr t
-        #{poke spBoneData, timelines} ptr ts
-instance Default SpAnimation where
-    def = SpAnimation nullPtr 0 0 nullPtr
-
-
--- | SpTimeline
-data SpTimeline = SpTimeline
-    { spTimeline_type :: SpTimelineType
-    , spTimeline_vtable :: Ptr () -- ^ const void* const vtable;
-    } deriving (Show, Eq)
-instance Storable SpTimeline where
-    alignment _ = #{alignment spTimeline}
-    sizeOf _ = #{size spTimeline}
-    peek ptr = do
-        t  <- #{peek spTimeline, type} ptr
-        vt <- #{peek spTimeline, vtable} ptr
-        return (SpTimeline t vt)
-    poke ptr (SpTimeline t vt) = do
-        #{poke spTimeline, type} ptr t
-        #{poke spTimeline, vtable} ptr vt
-instance Default SpTimeline where
-    def = SpTimeline SP_TIMELINE_SCALE nullPtr
-
--- | SpCurveTimeline
-data SpCurveTimeline = SpCurveTimeline
-    { spCurveTimeline_super :: SpTimeline
-    , spCurveTimeline_curves :: Ptr CFloat -- ^ type, x, y, ...
-    } deriving (Show, Eq)
-instance Storable SpCurveTimeline where
-    alignment _ = #{alignment spCurveTimeline}
-    sizeOf _ = #{size spCurveTimeline}
-    peek ptr = do
-        s <- #{peek spCurveTimeline, super} ptr
-        c <- #{peek spCurveTimeline, curves} ptr
-        return (SpCurveTimeline s c)
-    poke ptr (SpCurveTimeline s c) = do
-        #{poke spCurveTimeline, super} ptr s
-        #{poke spCurveTimeline, curves} ptr c
-instance Default SpCurveTimeline where
-    def = SpCurveTimeline (def :: SpTimeline) nullPtr
-
--- | SpBaseTimeline
-data SpBaseTimeline = SpBaseTimeline
-    { spBaseTimeline_super :: SpCurveTimeline
-    , spBaseTimeline_framesCount :: CInt
-    , spBaseTimeline_frames :: Ptr CFloat
-    , spBaseTimeline_boneIndex :: CInt
-    } deriving (Show, Eq)
-instance Storable SpBaseTimeline where
-    alignment _ = #{alignment spBaseTimeline}
-    sizeOf _ = #{size spBaseTimeline}
-    peek ptr = do
-        s <- #{peek spBaseTimeline,  super} ptr
-        fc <- #{peek spBaseTimeline, framesCount} ptr
-        fs <- #{peek spBaseTimeline, frames} ptr
-        b <- #{peek spBaseTimeline,  boneIndex} ptr
-        return (SpBaseTimeline s fc fs b)
-    poke ptr (SpBaseTimeline s fc fs b) = do
-        #{poke spBaseTimeline, super} ptr s
-        #{poke spBaseTimeline, framesCount} ptr fc
-        #{poke spBaseTimeline, frames} ptr fs
-        #{poke spBaseTimeline, boneIndex} ptr b
-instance Default SpBaseTimeline where
-    def = SpBaseTimeline nullPtr 0 nullPtr 0
-
--- | SpRotateTimeline
-type SpRotateTimeline    = SpBaseTimeline
-
--- | SpTranslateTimeline
-type SpTranslateTimeline = SpBaseTimeline
-
--- | SpScaleTimeline
-type SpScaleTimeline     = SpBaseTimeline
-
--- | SpShearTimeline
-type SpShearTimeline     = SpBaseTimeline
-
--- | SpColorTimeline
-data SpColorTimeline = SpColorTimeline
-    { spColorTimeline_super :: SpCurveTimeline
-    , spColorTimeline_framesCount :: CInt
-    , spColorTimeline_frames :: Ptr CFloat
-    , spColorTimeline_slotIndex :: CInt
-    } deriving (Show, Eq)
-instance Storable SpColorTimeline where
-    alignment _ = #{alignment spColorTimeline}
-    sizeOf _ = #{size spColorTimeline}
-    peek ptr = do
-        s <- #{peek spColorTimeline,  super} ptr
-        fc <- #{peek spColorTimeline, framesCount} ptr
-        fs <- #{peek spColorTimeline, frames} ptr
-        b <- #{peek spColorTimeline,  slotIndex} ptr
-        return (SpColorTimeline s fc fs b)
-    poke ptr (SpColorTimeline s fc fs b) = do
-        #{poke spColorTimeline, super} ptr s
-        #{poke spColorTimeline, framesCount} ptr fc
-        #{poke spColorTimeline, frames} ptr fs
-        #{poke spColorTimeline, slotIndex} ptr b
-instance Default SpColorTimeline where
-    def = SpColorTimeline nullPtr 0 nullPtr 0
-
--- | SpAttachmentTimeline
-data SpAttachmentTimeline = SpAttachmentTimeline
-    { spAttachmentTimeline_super       :: SpTimeline
-    , spAttachmentTimeline_framesCount :: CInt
-    , spAttachmentTimeline_frames      :: Ptr CFloat -- ^ time, ...
-    , spAttachmentTimeline_slotIndex   :: CInt
-    , spAttachmentTimeline_attachmentNames :: Ptr CString
-    } deriving (Show, Eq)
-instance Storable SpAttachmentTimeline where
-    alignment _ = #{alignment spAttachmentTimeline}
-    sizeOf _    = #{size      spAttachmentTimeline}
-    peek ptr = do
-        s <- #{peek spAttachmentTimeline, super} ptr
-        fc <- #{peek spAttachmentTimeline, framesCount} ptr
-        fs <- #{peek spAttachmentTimeline, frames} ptr
-        si <- #{peek spAttachmentTimeline, slotIndex} ptr
-        an <- #{peek spAttachmentTimeline, attachmentNames} ptr
-        return (SpAttachmentTimeline s fc fs si an)
-    poke ptr (SpAttachmentTimeline s fc fs si an) = do
-        #{poke spAttachmentTimeline, super}           ptr s
-        #{poke spAttachmentTimeline, framesCount}     ptr fc
-        #{poke spAttachmentTimeline, frames}          ptr fs
-        #{poke spAttachmentTimeline, slotIndex}       ptr si
-        #{poke spAttachmentTimeline, attachmentNames} ptr an
-instance Default SpAttachmentTimeline where
-    def = SpAttachmentTimeline nullPtr 0 nullPtr 0 nullPtr
-
--- | SpEventTimeline
-data SpEventTimeline = SpEventTimeline
-    { spEventTimeline_super       :: SpTimeline
-    , spEventTimeline_framesCount :: CInt
-    , spEventTimeline_frames      :: Ptr CFloat -- ^ time, ...
-    , spEventTimeline_events      :: Ptr (Ptr SpEvent)
-    } deriving (Show, Eq)
-instance Storable SpEventTimeline where
-    alignment _ = #{alignment spEventTimeline}
-    sizeOf _    = #{size      spEventTimeline}
-    peek ptr = do
-        s <- #{peek spEventTimeline, super} ptr
-        fc <- #{peek spEventTimeline, framesCount} ptr
-        fs <- #{peek spEventTimeline, frames} ptr
-        es <- #{peek spEventTimeline, events} ptr
-        return (SpEventTimeline s fc fs es)
-    poke ptr (SpEventTimeline s fc fs es) = do
-        #{poke spEventTimeline, super}           ptr s
-        #{poke spEventTimeline, framesCount}     ptr fc
-        #{poke spEventTimeline, frames}          ptr fs
-        #{poke spEventTimeline, events}          ptr es
-instance Default SpEventTimeline where
-    def = SpEventTimeline nullPtr 0 nullPtr nullPtr
-
--- | SpDrawOrderTimeline
-data SpDrawOrderTimeline = SpDrawOrderTimeline
-    { spDrawOrderTimeline_super       :: SpTimeline
-    , spDrawOrderTimeline_framesCount :: CInt
-    , spDrawOrderTimeline_frames      :: Ptr CFloat -- ^ time, ...
-    , spDrawOrderTimeline_drawOrders  :: Ptr (Ptr CInt)
-    , spDrawOrderTimeline_slotsCount  :: CInt
-    } deriving (Show, Eq)
-instance Storable SpDrawOrderTimeline where
-    alignment _ = #{alignment spDrawOrderTimeline}
-    sizeOf _    = #{size      spDrawOrderTimeline}
-    peek ptr = do
-        s  <- #{peek spDrawOrderTimeline, super}       ptr
-        fc <- #{peek spDrawOrderTimeline, framesCount} ptr
-        fs <- #{peek spDrawOrderTimeline, frames}      ptr
-        d  <- #{peek spDrawOrderTimeline, drawOrders}  ptr
-        sc <- #{peek spDrawOrderTimeline, slotsCount}  ptr
-        return (SpDrawOrderTimeline s fc fs d sc)
-    poke ptr (SpDrawOrderTimeline s fc fs d sc) = do
-        #{poke spDrawOrderTimeline, super}           ptr s
-        #{poke spDrawOrderTimeline, framesCount}     ptr fc
-        #{poke spDrawOrderTimeline, frames}          ptr fs
-        #{poke spDrawOrderTimeline, drawOrders}      ptr d
-        #{poke spDrawOrderTimeline, slotsCount}      ptr sc
-instance Default SpDrawOrderTimeline where
-    def = SpDrawOrderTimeline nullPtr 0 nullPtr nullPtr 0
-
--- | SpDeformTimeline
-data SpDeformTimeline = spDeformTimeline
-    { spDeformTimeline_super :: spCurveTimeline
-    , spDeformTimeline_framesCount :: CInt
-    , spDeformTimeline_frames :: Ptr CFloat -- ^ /* time, ... */
-    , spDeformTimeline_frameVerticesCount :: CInt
-    , spDeformTimeline_frameVertices :: Ptr (Ptr CFloat)
-    , spDeformTimeline_slotIndex :: CInt
-    , spDeformTimeline_attachment :: Ptr SpAttachment
-    } deriving (Show, Eq)
---
-
---
-instance Default SpDeformTimeline where
-    def = SpDeformTimeline nullPtr 0 nullPtr 0 nullPtr 0 nullPtr
-
-
-
-
-
-
-
-
-typedef struct spIkConstraintTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, mix, bendDirection, ... */
-	int ikConstraintIndex;
-
-#ifdef __cplusplus
-	spIkConstraintTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		ikConstraintIndex(0) {
-	}
-#endif
-} spIkConstraintTimeline;
-
-
-
-
-typedef struct spTransformConstraintTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
-	int transformConstraintIndex;
-
-#ifdef __cplusplus
-	spTransformConstraintTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		transformConstraintIndex(0) {
-	}
-#endif
-} spTransformConstraintTimeline;
-
-
-
-
-typedef struct spPathConstraintPositionTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
-	int pathConstraintIndex;
-
-#ifdef __cplusplus
-	spPathConstraintPositionTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		pathConstraintIndex(0) {
-	}
-#endif
-} spPathConstraintPositionTimeline;
-
-
-
-
-typedef struct spPathConstraintSpacingTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
-	int pathConstraintIndex;
-
-#ifdef __cplusplus
-	spPathConstraintSpacingTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		pathConstraintIndex(0) {
-	}
-#endif
-} spPathConstraintSpacingTimeline;
-
-
-
-
-typedef struct spPathConstraintMixTimeline {
-	spCurveTimeline super;
-	int const framesCount;
-	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
-	int pathConstraintIndex;
-
-#ifdef __cplusplus
-	spPathConstraintMixTimeline() :
-		super(),
-		framesCount(0),
-		frames(0),
-		pathConstraintIndex(0) {
-	}
-#endif
-} spPathConstraintMixTimeline;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- SpAnimation
--- -- -- -- -- --
 foreign import ccall "spAnimation_create" spAnimation_create_FFI
     :: CString -- ^ name
     -> CInt -- ^ timelinesCount
-    -> IO (Ptr SpAnimation)
+    -> IO Ptr SpAnimation
+
 foreign import ccall "spAnimation_dispose" spAnimation_dispose_FFI
     :: Ptr SpAnimation -- ^ self
     -> IO ()
+
+-- | * Poses the skeleton at the specified time for this animation.  * @param lastTime The last time the animation was applied.  * @param events Any triggered events are added. May be null.
 foreign import ccall "spAnimation_apply" spAnimation_apply_FFI
     :: Ptr SpAnimation -- ^ self
     -> Ptr SpSkeleton -- ^ skeleton
     -> CFloat -- ^ lastTime
     -> CFloat -- ^ time
     -> CInt -- ^ loop
-    -> Ptr (Ptr SpEvent) -- ^ events
+    -> Ptr ( Ptr SpEvent ) -- ^ events
     -> Ptr CInt -- ^ eventsCount
     -> CFloat -- ^ alpha
-    -> CInt -- ^ (boolean) setupPose
-    -> CInt -- ^ (boolean) mixingOut
+    -> CInt -- ^ setupPose :: boolean
+    -> CInt -- ^ mixingOut :: boolean
     -> IO ()
 
--- SpTimeline
--- -- -- -- -- --
 foreign import ccall "spTimeline_dispose" spTimeline_dispose_FFI
     :: Ptr SpTimeline -- ^ self
     -> IO ()
+
 foreign import ccall "spTimeline_apply" spTimeline_apply_FFI
     :: Ptr SpTimeline -- ^ self
     -> Ptr SpSkeleton -- ^ skeleton
     -> CFloat -- ^ lastTime
     -> CFloat -- ^ time
-    -> Ptr (Ptr SpEvent) -- ^ firedEvents
+    -> Ptr ( Ptr SpEvent ) -- ^ firedEvents
     -> Ptr CInt -- ^ eventsCount
     -> CFloat -- ^ alpha
-    -> CInt -- ^ (boolean) setupPose
-    -> CInt -- ^ (boolean) mixingOut
+    -> CInt -- ^ setupPose :: boolean
+    -> CInt -- ^ mixingOut :: boolean
     -> IO ()
+
 foreign import ccall "spTimeline_getPropertyId" spTimeline_getPropertyId_FFI
     :: Ptr SpTimeline -- ^ self
     -> IO CInt
 
--- SpCurveTimeline
--- -- -- -- -- --
-foreign import ccall "spCurveTimeline_setLinear" spCurveTimeline_setLinear_FFI ::
-    Ptr SpCurveTimeline -> CInt -> IO ()
-foreign import ccall "spCurveTimeline_setStepped" spCurveTimeline_setStepped_FFI ::
-    Ptr SpCurveTimeline -> CInt -> IO ()
+foreign import ccall "spCurveTimeline_setLinear" spCurveTimeline_setLinear_FFI
+    :: Ptr SpCurveTimeline -- ^ self
+    -> CInt -- ^ frameIndex
+    -> IO ()
+
+foreign import ccall "spCurveTimeline_setStepped" spCurveTimeline_setStepped_FFI
+    :: Ptr SpCurveTimeline -- ^ self
+    -> CInt -- ^ frameIndex
+    -> IO ()
+
+-- | Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.  * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of  * the difference between the keyframe's values.
 foreign import ccall "spCurveTimeline_setCurve" spCurveTimeline_setCurve_FFI
     :: Ptr SpCurveTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -492,17 +136,17 @@ foreign import ccall "spCurveTimeline_setCurve" spCurveTimeline_setCurve_FFI
     -> CFloat -- ^ cx2
     -> CFloat -- ^ cy2
     -> IO ()
+
 foreign import ccall "spCurveTimeline_getCurvePercent" spCurveTimeline_getCurvePercent_FFI
     :: Ptr SpCurveTimeline -- ^ self
     -> CInt -- ^ frameIndex
     -> CFloat -- ^ percent
     -> IO CFloat
 
--- SpRotateTimeline
--- -- -- -- -- --
 foreign import ccall "spRotateTimeline_create" spRotateTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpRotateTimeline)
+    -> IO Ptr SpRotateTimeline
+
 foreign import ccall "spRotateTimeline_setFrame" spRotateTimeline_setFrame_FFI
     :: Ptr SpRotateTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -510,11 +154,10 @@ foreign import ccall "spRotateTimeline_setFrame" spRotateTimeline_setFrame_FFI
     -> CFloat -- ^ angle
     -> IO ()
 
--- SpTranslateTimeline
--- -- -- -- -- --
 foreign import ccall "spTranslateTimeline_create" spTranslateTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpTranslateTimeline)
+    -> IO Ptr SpTranslateTimeline
+
 foreign import ccall "spTranslateTimeline_setFrame" spTranslateTimeline_setFrame_FFI
     :: Ptr SpTranslateTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -523,12 +166,11 @@ foreign import ccall "spTranslateTimeline_setFrame" spTranslateTimeline_setFrame
     -> CFloat -- ^ y
     -> IO ()
 
--- SpScaleTimeline
--- -- -- -- -- --
 foreign import ccall "spScaleTimeline_create" spScaleTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpScaleTimeline)
-foreign import ccall "spScaleTimeline_setFrame" spScaleTimeline_setFrame _FFI
+    -> IO Ptr SpScaleTimeline
+
+foreign import ccall "spScaleTimeline_setFrame" spScaleTimeline_setFrame_FFI
     :: Ptr SpScaleTimeline -- ^ self
     -> CInt -- ^ frameIndex
     -> CFloat -- ^ time
@@ -536,11 +178,10 @@ foreign import ccall "spScaleTimeline_setFrame" spScaleTimeline_setFrame _FFI
     -> CFloat -- ^ y
     -> IO ()
 
--- SpShearTimeline
--- -- -- -- -- --
 foreign import ccall "spShearTimeline_create" spShearTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpShearTimeline)
+    -> IO Ptr SpShearTimeline
+
 foreign import ccall "spShearTimeline_setFrame" spShearTimeline_setFrame_FFI
     :: Ptr SpShearTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -549,11 +190,10 @@ foreign import ccall "spShearTimeline_setFrame" spShearTimeline_setFrame_FFI
     -> CFloat -- ^ y
     -> IO ()
 
--- SpColorTimeline
--- -- -- -- -- --
 foreign import ccall "spColorTimeline_create" spColorTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpColorTimeline)
+    -> IO Ptr SpColorTimeline
+
 foreign import ccall "spColorTimeline_setFrame" spColorTimeline_setFrame_FFI
     :: Ptr SpColorTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -564,11 +204,11 @@ foreign import ccall "spColorTimeline_setFrame" spColorTimeline_setFrame_FFI
     -> CFloat -- ^ a
     -> IO ()
 
--- SpAttachmentTimeline
--- -- -- -- -- --
 foreign import ccall "spAttachmentTimeline_create" spAttachmentTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpAttachmentTimeline)
+    -> IO Ptr SpAttachmentTimeline
+
+-- | @param attachmentName May be 0.
 foreign import ccall "spAttachmentTimeline_setFrame" spAttachmentTimeline_setFrame_FFI
     :: Ptr SpAttachmentTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -576,23 +216,21 @@ foreign import ccall "spAttachmentTimeline_setFrame" spAttachmentTimeline_setFra
     -> CString -- ^ attachmentName
     -> IO ()
 
--- SpEventTimeline
--- -- -- -- -- --
 foreign import ccall "spEventTimeline_create" spEventTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpEventTimeline)
+    -> IO Ptr SpEventTimeline
+
 foreign import ccall "spEventTimeline_setFrame" spEventTimeline_setFrame_FFI
     :: Ptr SpEventTimeline -- ^ self
     -> CInt -- ^ frameIndex
     -> Ptr SpEvent -- ^ event
     -> IO ()
 
--- SpDrawOrderTimeline
--- -- -- -- -- --
 foreign import ccall "spDrawOrderTimeline_create" spDrawOrderTimeline_create_FFI
     :: CInt -- ^ framesCount
     -> CInt -- ^ slotsCount
-    -> IO (Ptr SpDrawOrderTimeline)
+    -> IO Ptr SpDrawOrderTimeline
+
 foreign import ccall "spDrawOrderTimeline_setFrame" spDrawOrderTimeline_setFrame_FFI
     :: Ptr SpDrawOrderTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -600,12 +238,11 @@ foreign import ccall "spDrawOrderTimeline_setFrame" spDrawOrderTimeline_setFrame
     -> Ptr CInt -- ^ drawOrder
     -> IO ()
 
--- SpDeformTimeline
--- -- -- -- -- --
 foreign import ccall "spDeformTimeline_create" spDeformTimeline_create_FFI
     :: CInt -- ^ framesCount
     -> CInt -- ^ frameVerticesCount
-    -> IO (Ptr SpDeformTimeline)
+    -> IO Ptr SpDeformTimeline
+
 foreign import ccall "spDeformTimeline_setFrame" spDeformTimeline_setFrame_FFI
     :: Ptr SpDeformTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -613,11 +250,10 @@ foreign import ccall "spDeformTimeline_setFrame" spDeformTimeline_setFrame_FFI
     -> Ptr CFloat -- ^ vertices
     -> IO ()
 
--- SpIkConstraintTimeline
--- -- -- -- -- --
 foreign import ccall "spIkConstraintTimeline_create" spIkConstraintTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpIkConstraintTimeline)
+    -> IO Ptr SpIkConstraintTimeline
+
 foreign import ccall "spIkConstraintTimeline_setFrame" spIkConstraintTimeline_setFrame_FFI
     :: Ptr SpIkConstraintTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -626,11 +262,10 @@ foreign import ccall "spIkConstraintTimeline_setFrame" spIkConstraintTimeline_se
     -> CInt -- ^ bendDirection
     -> IO ()
 
--- SpTransformConstraintTimeline
--- -- -- -- -- --
 foreign import ccall "spTransformConstraintTimeline_create" spTransformConstraintTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpTransformConstraintTimeline)
+    -> IO Ptr SpTransformConstraintTimeline
+
 foreign import ccall "spTransformConstraintTimeline_setFrame" spTransformConstraintTimeline_setFrame_FFI
     :: Ptr SpTransformConstraintTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -641,11 +276,10 @@ foreign import ccall "spTransformConstraintTimeline_setFrame" spTransformConstra
     -> CFloat -- ^ shearMix
     -> IO ()
 
--- SpPathConstraintPositionTimeline
--- -- -- -- -- --
 foreign import ccall "spPathConstraintPositionTimeline_create" spPathConstraintPositionTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpPathConstraintPositionTimeline)
+    -> IO Ptr SpPathConstraintPositionTimeline
+
 foreign import ccall "spPathConstraintPositionTimeline_setFrame" spPathConstraintPositionTimeline_setFrame_FFI
     :: Ptr SpPathConstraintPositionTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -653,11 +287,10 @@ foreign import ccall "spPathConstraintPositionTimeline_setFrame" spPathConstrain
     -> CFloat -- ^ value
     -> IO ()
 
--- SpPathConstraintSpacingTimeline
--- -- -- -- -- --
 foreign import ccall "spPathConstraintSpacingTimeline_create" spPathConstraintSpacingTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpPathConstraintSpacingTimeline)
+    -> IO Ptr SpPathConstraintSpacingTimeline
+
 foreign import ccall "spPathConstraintSpacingTimeline_setFrame" spPathConstraintSpacingTimeline_setFrame_FFI
     :: Ptr SpPathConstraintSpacingTimeline -- ^ self
     -> CInt -- ^ frameIndex
@@ -665,22 +298,18 @@ foreign import ccall "spPathConstraintSpacingTimeline_setFrame" spPathConstraint
     -> CFloat -- ^ value
     -> IO ()
 
--- SpPathConstraintMixTimeline
--- -- -- -- -- --
 foreign import ccall "spPathConstraintMixTimeline_create" spPathConstraintMixTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO (Ptr SpPathConstraintMixTimeline)
+    -> IO Ptr SpPathConstraintMixTimeline
+
 foreign import ccall "spPathConstraintMixTimeline_setFrame" spPathConstraintMixTimeline_setFrame_FFI
-    :: spPathConstraintMixTimeline -- ^ self
+    :: Ptr SpPathConstraintMixTimeline -- ^ self
     -> CInt -- ^ frameIndex
     -> CFloat -- ^ time
     -> CFloat -- ^ rotateMix
     -> CFloat -- ^ translateMix
     -> IO ()
 
-
-
--- constants
 pattern ROTATE_PREV_TIME :: CInt
 pattern ROTATE_PREV_TIME = #{const ROTATE_PREV_TIME}
 pattern ROTATE_PREV_ROTATION :: CInt
