@@ -1,45 +1,13 @@
-foreign import ccall "spCurveTimeline_setLinear" spCurveTimeline_setLinear_FFI
-    :: Ptr SpCurveTimeline -- ^ self
-    -> CInt -- ^ frameIndex
-    -> IO ()
+foreign import ccall "spAnimation_create" spAnimation_create_FFI
+    :: CString -- ^ name
+    -> CInt -- ^ timelinesCount
+    -> IO Ptr SpAnimation
 
-foreign import ccall "spCurveTimeline_setStepped" spCurveTimeline_setStepped_FFI
-    :: Ptr SpCurveTimeline -- ^ self
-    -> CInt -- ^ frameIndex
-    -> IO ()
-
--- | Sets the control handle positions for an interpolation bezier curve used to transition from this keyframe to the next.  * cx1 and cx2 are from 0 to 1, representing the percent of time between the two keyframes. cy1 and cy2 are the percent of  * the difference between the keyframe's values.
-foreign import ccall "spCurveTimeline_setCurve" spCurveTimeline_setCurve_FFI
-    :: Ptr SpCurveTimeline -- ^ self
-    -> CInt -- ^ frameIndex
-    -> CFloat -- ^ cx1
-    -> CFloat -- ^ cy1
-    -> CFloat -- ^ cx2
-    -> CFloat -- ^ cy2
-    -> IO ()
-
-foreign import ccall "spCurveTimeline_getCurvePercent" spCurveTimeline_getCurvePercent_FFI
-    :: Ptr SpCurveTimeline -- ^ self
-    -> CInt -- ^ frameIndex
-    -> CFloat -- ^ percent
-    -> IO CFloat
-
-foreign import ccall "spRotateTimeline_create" spRotateTimeline_create_FFI
-    :: CInt -- ^ framesCount
-    -> IO Ptr SpRotateTimeline
-
-foreign import ccall "spRotateTimeline_setFrame" spRotateTimeline_setFrame_FFI
-    :: Ptr SpRotateTimeline -- ^ self
-    -> CInt -- ^ frameIndex
-    -> CFloat -- ^ time
-    -> CFloat -- ^ angle
+foreign import ccall "spAnimation_dispose" spAnimation_dispose_FFI
+    :: Ptr SpAnimation -- ^ self
     -> IO ()
 
 
 
-    , SpCurveTimeline_setLinear
-    , SpCurveTimeline_setStepped
-    , SpCurveTimeline_setCurve
-    , SpCurveTimeline_getCurvePercent
-    , SpRotateTimeline_create
-    , SpRotateTimeline_setFrame
+    , SpAnimation_create
+    , SpAnimation_dispose

@@ -19,6 +19,46 @@ module Spine.Raw.Animation
 -- import Foreign.C.Types
 --
 
+ /*boolean*/
+
+# spAnimation_apply args bool
+# spTimeline_apply
+
+typedef enum {
+	SP_TIMELINE_ROTATE,
+	SP_TIMELINE_TRANSLATE,
+	SP_TIMELINE_SCALE,
+	SP_TIMELINE_SHEAR,
+	SP_TIMELINE_ATTACHMENT,
+	SP_TIMELINE_COLOR,
+	SP_TIMELINE_DEFORM,
+	SP_TIMELINE_EVENT,
+	SP_TIMELINE_DRAWORDER,
+	SP_TIMELINE_IKCONSTRAINT,
+	SP_TIMELINE_TRANSFORMCONSTRAINT,
+	SP_TIMELINE_PATHCONSTRAINTPOSITION,
+	SP_TIMELINE_PATHCONSTRAINTSPACING,
+	SP_TIMELINE_PATHCONSTRAINTMIX
+} spTimelineType;
+
+static const int ROTATE_PREV_TIME = -2
+static const int ROTATE_PREV_ROTATION = -1;
+static const int ROTATE_ROTATION = 1;
+static const int ROTATE_ENTRIES = 2;
+static const int TRANSLATE_ENTRIES = 3;
+static const int COLOR_ENTRIES = 5;
+static const int IKCONSTRAINT_ENTRIES = 3;
+static const int TRANSFORMCONSTRAINT_ENTRIES = 5;
+static const int PATHCONSTRAINTPOSITION_ENTRIES = 2;
+static const int PATHCONSTRAINTSPACING_ENTRIES = 2;
+static const int PATHCONSTRAINTMIX_ENTRIES = 3;
+
+typedef struct spBaseTimeline spShearTimeline;
+typedef struct spBaseTimeline spScaleTimeline;
+typedef struct spBaseTimeline spTranslateTimeline;
+typedef struct spBaseTimeline spRotateTimeline;
+
+
 -- | SpAnimation
 data SpAnimation = SpAnimation
     { spAnimation_name :: CString
