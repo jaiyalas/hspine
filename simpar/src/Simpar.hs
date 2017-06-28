@@ -107,6 +107,8 @@ parseFunctionEntity = do
 parseArgEntity :: Parsec String st ArgEntity
 parseArgEntity = do
     spaces
+    optional (try $ string "struct")
+    spaces
     ty <- parseFTypEntity
     spaces
     tname <- many1 $ choice [alphaNum, char '_']
