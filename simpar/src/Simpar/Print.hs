@@ -2,6 +2,9 @@ module Simpar.Print
     ( -- * PrintHsc
       PrintHsc(..)
     , printStorable
+    -- * Print exposing (model-level) infomation for hsc
+    , printModel_struct
+    , printModel_function
     -- * auxiliary functions
     , nline
     , softtab
@@ -80,6 +83,25 @@ instance PrintHsc FunctionEntity where
         ++ printHsc rttype
         ++ nline
 --
+printModel_struct :: [StructEntity] -> String
+printModel_struct [] = ""
+printModel_struct (x:xs) =
+    softtab 1
+    ++ ", data "
+    ++ upHead (sname x)
+    ++ "(..)"
+    ++ nline
+    ++ printModel_struct xs
+--
+printModel_function :: [FunctionEntity] -> String
+printModel_function [] = ""
+printModel_function (x:xs) =
+    softtab 1
+    ++ ", "
+    ++ upHead (fname x)
+    ++ nline
+    ++ printModel_function xs
+--
 -- | Generate a string of storable instance. Required by the instance `PrintHsc StructEntity`
 printStorable :: String -> [String] -> [String] -> String
 printStorable name args fields =
@@ -156,3 +178,4 @@ softtab n = "    " ++ softtab (n-1)
 -- | capitalize the first char of given string
 upHead :: String -> String
 upHead (x:xs) = toUpper x : xs
+--

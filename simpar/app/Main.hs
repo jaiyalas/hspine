@@ -29,16 +29,25 @@ main = do
 
 -- typedef struct spBaseTimeline spRotateTimeline;
 --
-toFile_either :: (PrintHsc a, PrintHsc b) => [Either a b] -> IO ()
+toFile_either :: [Either StructEntity FunctionEntity] -> IO ()
 toFile_either e = do
-    toFile "s" (lefts e)
-    toFile "f" (rights e)
+    toFileS (lefts e)
+    toFileF (rights e)
 --
-toFile :: PrintHsc a => String -> [a] -> IO ()
-toFile s ses = do
-    h2 <- openFile ("output_"++s++".hsc") WriteMode
+toFileS :: [StructEntity] -> IO ()
+toFileS ses = do
+    h2 <- openFile ("output_s.hsc") WriteMode
     hPutStr h2 $ printHsc ses
-    -- hPutStr h2 $ pm ses
+    hPutStr h2 "\n\n"
+    hPutStr h2 $ printModel_struct ses
+    hClose h2
+--
+toFileF :: [FunctionEntity] -> IO ()
+toFileF ses = do
+    h2 <- openFile ("output_f.hsc") WriteMode
+    hPutStr h2 $ printHsc ses
+    hPutStr h2 "\n\n"
+    hPutStr h2 $ printModel_function ses
     hClose h2
 --
 parseBoth :: Parsec String st [Either StructEntity FunctionEntity]
@@ -64,18 +73,9 @@ parseStructs = parse (many (do {
 parseFuns :: String -> Either ParseError [FunctionEntity]
 parseFuns = parse (many (do {spaces; x <- parseFunctionEntity; spaces; return x})) ""
 --
-pm :: [StructEntity] -> String
-pm [] = ""
-pm (x:xs) = softtab 1
-    ++ ", data "
-    ++ upHead (sname x)
-    ++ "(..)"
-    ++ nline
-    ++ pm xs
-
 rmLn :: String -> String
 rmLn str = map (\x -> if x == '\n' || x == '\t' then ' ' else x) str
-
+--
 -- -- -- -- -- -- -- -- -- --
 -- void spCurveTimeline_setStepped (spCurveTimeline* self, int frameIndex);
 -- float spCurveTimeline_getCurvePercent (const spCurveTimeline* self, int frameIndex, float percent);

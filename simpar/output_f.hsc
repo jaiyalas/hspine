@@ -35,3 +35,11 @@ foreign import ccall "spRotateTimeline_setFrame" spRotateTimeline_setFrame_FFI
     -> CFloat -- ^ angle
     -> IO ()
 
+
+
+    , SpCurveTimeline_setLinear
+    , SpCurveTimeline_setStepped
+    , SpCurveTimeline_setCurve
+    , SpCurveTimeline_getCurvePercent
+    , SpRotateTimeline_create
+    , SpRotateTimeline_setFrame

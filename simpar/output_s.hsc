@@ -36,3 +36,7 @@ instance Storable SpBaseTimeline where
         #{poke spBaseTimeline, frames} ptr c
         #{poke spBaseTimeline, boneIndex} ptr d
 
+
+
+    , data SpCurveTimeline(..)
+    , data SpBaseTimeline(..)
