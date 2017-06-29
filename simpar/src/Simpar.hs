@@ -115,3 +115,44 @@ parseArgEntity = do
     spaces
     return (ArgEntity tname ty)
 --
+parseConstantEntity :: Parsec String st ConstantEntity
+parseConstantEntity = do
+    string "static const"
+    spaces
+    cty <- parseFTypEntity
+    spaces
+    cname <- many1 $ choice [alphaNum, char '_']
+    spaces
+    char '='
+    spaces
+    many1 $ choice [char '-', alphaNum, char '_']
+    spaces
+    choice [char ';', char ',']
+    return (ConstantEntity cty cname)
+--
+-- MAGIC
+parseStructEntityM :: Parsec String st Magic
+parseStructEntityM = parseStructEntity >>= (return . MagicStruct)
+parseFunctionEntityM :: Parsec String st Magic
+parseFunctionEntityM = parseFunctionEntity >>= (return . MagicFunction)
+parseConstantEntityM :: Parsec String st Magic
+parseConstantEntityM = parseConstantEntity >>= (return . MagicConstant)
+--
+parseMagics :: Parsec String st [Magic]
+parseMagics = many
+    (   try (spaces >> parseConstantEntityM >>= (\x -> spaces >> return x))
+    <|> try (spaces >> parseStructEntityM   >>= (\x -> spaces >> return x))
+    <|> try (spaces >> parseFunctionEntityM >>= (\x -> spaces >> return x)) )
+--
+-- parseBoth :: Parsec String st [Either StructEntity FunctionEntity]
+-- parseBoth = many (try parseRightFunc <|> try parseLeftStruct)
+--
+-- spsf :: (a -> b) -> Parsec String st a -> Parsec String st b
+-- spsf f p = do
+--     spaces
+--     x <- p
+--     spaces
+--     return (f x)
+-- --
+-- parseRightFunc = spsf Right parseFunctionEntity
+-- parseLeftStruct = spsf Left parseStructEntity

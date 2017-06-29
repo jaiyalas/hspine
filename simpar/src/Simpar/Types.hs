@@ -1,5 +1,30 @@
 module Simpar.Types where
 --
+-- | (universal) data union
+data Magic
+    = MagicStruct StructEntity
+    | MagicFunction FunctionEntity
+    | MagicConstant ConstantEntity
+    deriving (Show, Eq)
+--
+deMagic' :: [Magic]
+        -> ([StructEntity],[FunctionEntity],[ConstantEntity])
+        -> ([StructEntity],[FunctionEntity],[ConstantEntity])
+deMagic' [] res = res
+deMagic' ((MagicStruct   x):xs) (ss,fs,cs) = deMagic' xs (ss ++ [x], fs, cs)
+deMagic' ((MagicFunction x):xs) (ss,fs,cs) = deMagic' xs (ss, fs ++ [x], cs)
+deMagic' ((MagicConstant x):xs) (ss,fs,cs) = deMagic' xs (ss, fs, cs ++ [x])
+--
+deMagic :: [Magic]
+        -> ([StructEntity],[FunctionEntity],[ConstantEntity])
+deMagic xs = deMagic' xs ([],[],[])
+--
+-- | constant
+data ConstantEntity = ConstantEntity
+    { ctype :: FTypEntity
+    , cname :: String
+    } deriving (Show, Eq)
+--
 -- | foreign types
 data FTyp
     = FTInt

@@ -5,6 +5,7 @@ module Simpar.Print
     -- * Print exposing (model-level) infomation for hsc
     , printModel_struct
     , printModel_function
+    , printModel_constant
     -- * auxiliary functions
     , nline
     , softtab
@@ -20,6 +21,10 @@ class PrintHsc a where
     -- | print string for .hsc
     printHsc :: a -> String
 --
+instance PrintHsc Magic where
+    printHsc (MagicStruct se) = printHsc se
+    printHsc (MagicFunction fe) = printHsc fe
+    printHsc (MagicConstant ce) = printHsc ce
 instance PrintHsc a => PrintHsc [a] where
     printHsc [] = ""
     printHsc (x:xs) = (printHsc x) ++ nline ++ (printHsc xs)
@@ -83,6 +88,13 @@ instance PrintHsc FunctionEntity where
         ++ printHsc rttype
         ++ nline
 --
+instance PrintHsc ConstantEntity where
+    printHsc (ConstantEntity ctype cname) = concat
+        [ "pattern " , cname , " :: " , printHsc ctype
+        , nline
+        , "pattern " , cname , " = #{const " , cname , "}"
+        ]
+--
 printModel_struct :: [StructEntity] -> String
 printModel_struct [] = ""
 printModel_struct (x:xs) =
@@ -101,6 +113,15 @@ printModel_function (x:xs) =
     ++ upHead (fname x)
     ++ nline
     ++ printModel_function xs
+--
+printModel_constant :: [ConstantEntity] -> String
+printModel_constant [] = ""
+printModel_constant (x:xs) = concat
+    [ softtab 1
+    , ", pattern "
+    , cname x
+    , nline
+    , printModel_constant xs ]
 --
 -- | Generate a string of storable instance. Required by the instance `PrintHsc StructEntity`
 printStorable :: String -> [String] -> [String] -> String
