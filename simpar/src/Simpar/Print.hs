@@ -31,7 +31,9 @@ instance PrintHsc a => PrintHsc [a] where
 instance PrintHsc StructEntity where
     printHsc (StructEntity structName sfs) =
         let fsMount = length sfs
-            argNames = take fsMount $ map (\c->[c]) ['a'..'z']
+            argNames = take fsMount
+                     $ (\xs -> xs ++ map (++"2") xs)
+                     $ map (\c->[c]) ['a'..'z']
             fnames = map fieldName sfs
         in "-- | "
         ++ upHead structName
@@ -99,7 +101,7 @@ printModel_struct :: [StructEntity] -> String
 printModel_struct [] = ""
 printModel_struct (x:xs) =
     softtab 1
-    ++ ", data "
+    ++ ", "
     ++ upHead (sname x)
     ++ "(..)"
     ++ nline
@@ -110,7 +112,7 @@ printModel_function [] = ""
 printModel_function (x:xs) =
     softtab 1
     ++ ", "
-    ++ upHead (fname x)
+    ++ fname x
     ++ nline
     ++ printModel_function xs
 --

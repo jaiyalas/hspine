@@ -1,25 +1,26 @@
 module Spine.Raw.InternalStruct(
     -- * spine/Animation
-      data SpAnimation(..)
-    , data SpTimeline(..)
-    , data SpCurveTimeline(..)
-    , data SpBaseTimeline(..)
-    , data SpColorTimeline(..)
-    , data SpAttachmentTimeline(..)
-    , data SpEventTimeline(..)
-    , data SpDrawOrderTimeline(..)
-    , data SpDeformTimeline(..)
-    , data SpIkConstraintTimeline(..)
-    , data SpTransformConstraintTimeline(..)
-    , data SpPathConstraintPositionTimeline(..)
-    , data SpPathConstraintSpacingTimeline(..)
-    , data SpPathConstraintMixTimeline(..)
+      SpAnimation(..)
+    , SpTimeline(..)
+    , SpCurveTimeline(..)
+    , SpBaseTimeline(..)
+    , SpColorTimeline(..)
+    , SpAttachmentTimeline(..)
+    , SpEventTimeline(..)
+    , SpDrawOrderTimeline(..)
+    , SpDeformTimeline(..)
+    , SpIkConstraintTimeline(..)
+    , SpTransformConstraintTimeline(..)
+    , SpPathConstraintPositionTimeline(..)
+    , SpPathConstraintSpacingTimeline(..)
+    , SpPathConstraintMixTimeline(..)
     -- * spine/AnimationState
-    , data SpTrackEntry(..)
-    , data SpAnimationState(..)
+    , SpAnimationStateListener
+    , SpTrackEntry(..)
+    , SpAnimationState(..)
     -- * spine/AnimationStateData
-    , data SpAnimationStateData(..)
-    -- * 
+    , SpAnimationStateData(..)
+    -- *
     ) where
 --
 #include "spine/Animation.h"
@@ -397,6 +398,16 @@ instance Storable SpPathConstraintMixTimeline where
 --  "spine/AnimationState"
 -- #####################
 
+-- | SpAnimationStateListener
+-- typedef void (*spAnimationStateListener)
+--     (spAnimationState* state, spEventType type, spTrackEntry* entry, spEvent* event);
+type SpAnimationStateListener
+    =  Ptr SpAnimationState -- ^ state
+    -> SpEventType -- ^ type
+    -> Ptr SpTrackEntry -- ^ entry
+    -> Ptr SpEvent -- ^ event
+    -> IO ()
+
 -- | SpTrackEntry
 data SpTrackEntry = SpTrackEntry
     { animation :: Ptr SpAnimation
@@ -459,8 +470,11 @@ instance Storable SpTrackEntry where
         x <- #{peek spTrackEntry, timelinesFirst} ptr
         y <- #{peek spTrackEntry, timelinesFirstCount} ptr
         z <- #{peek spTrackEntry, timelinesRotation} ptr
-        return (SpTrackEntry a b c d e f g h i j k l m n o p q r s t u v w x y z)
-    poke ptr (SpTrackEntry a b c d e f g h i j k l m n o p q r s t u v w x y z) = do
+        a2 <- #{peek spTrackEntry, timelinesRotationCount} ptr
+        b2 <- #{peek spTrackEntry, rendererObject} ptr
+        c2 <- #{peek spTrackEntry, userData} ptr
+        return (SpTrackEntry a b c d e f g h i j k l m n o p q r s t u v w x y z a2 b2 c2)
+    poke ptr (SpTrackEntry a b c d e f g h i j k l m n o p q r s t u v w x y z a2 b2 c2) = do
         #{poke spTrackEntry, animation} ptr a
         #{poke spTrackEntry, next} ptr b
         #{poke spTrackEntry, mixingFrom} ptr c
@@ -487,6 +501,9 @@ instance Storable SpTrackEntry where
         #{poke spTrackEntry, timelinesFirst} ptr x
         #{poke spTrackEntry, timelinesFirstCount} ptr y
         #{poke spTrackEntry, timelinesRotation} ptr z
+        #{poke spTrackEntry, timelinesRotationCount} ptr a2
+        #{poke spTrackEntry, rendererObject} ptr b2
+        #{poke spTrackEntry, userData} ptr c2
 
 -- | SpAnimationState
 data SpAnimationState = SpAnimationState

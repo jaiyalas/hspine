@@ -1,61 +1,63 @@
-module Spine.Raw.Animation (
-    -- * Functions
+module Spine.Raw.Animation
+    (
+    -- * functions
     -- ** SpAnimation
-      SpAnimation_create
-    , SpAnimation_dispose
-    , SpAnimation_apply
+      spAnimation_create
+    , spAnimation_dispose
+    , spAnimation_apply
     -- ** SpTimeline
-    , SpTimeline_dispose
-    , SpTimeline_apply
-    , SpTimeline_getPropertyId
+    , spTimeline_dispose
+    , spTimeline_apply
+    , spTimeline_getPropertyId
     -- ** SpCurveTimeline
-    , SpCurveTimeline_setLinear
-    , SpCurveTimeline_setStepped
-    , SpCurveTimeline_setCurve
-    , SpCurveTimeline_getCurvePercent
-    -- ** SpRotateTimeline
-    , SpRotateTimeline_create
-    , SpRotateTimeline_setFrame
-    -- ** SpTranslateTimeline
-    , SpTranslateTimeline_create
-    , SpTranslateTimeline_setFrame
-    -- ** SpScaleTimeline
-    , SpScaleTimeline_create
-    , SpScaleTimeline_setFrame
-    -- ** SpShearTimeline
-    , SpShearTimeline_create
-    , SpShearTimeline_setFrame
+    , spCurveTimeline_setLinear
+    , spCurveTimeline_setStepped
+    , spCurveTimeline_setCurve
+    , spCurveTimeline_getCurvePercent
+    -- ** SpBaseTimeline
+    -- *** SpRotateTimeline
+    , spRotateTimeline_create
+    , spRotateTimeline_setFrame
+    -- *** SpTranslateTimeline
+    , spTranslateTimeline_create
+    , spTranslateTimeline_setFrame
+    -- *** SpScaleTimeline
+    , spScaleTimeline_create
+    , spScaleTimeline_setFrame
+    -- *** SpShearTimeline
+    , spShearTimeline_create
+    , spShearTimeline_setFrame
     -- ** SpColorTimeline
-    , SpColorTimeline_create
-    , SpColorTimeline_setFrame
+    , spColorTimeline_create
+    , spColorTimeline_setFrame
     -- ** SpAttachmentTimeline
-    , SpAttachmentTimeline_create
-    , SpAttachmentTimeline_setFrame
+    , spAttachmentTimeline_create
+    , spAttachmentTimeline_setFrame
     -- ** SpEventTimeline
-    , SpEventTimeline_create
-    , SpEventTimeline_setFrame
+    , spEventTimeline_create
+    , spEventTimeline_setFrame
     -- ** SpDrawOrderTimeline
-    , SpDrawOrderTimeline_create
-    , SpDrawOrderTimeline_setFrame
+    , spDrawOrderTimeline_create
+    , spDrawOrderTimeline_setFrame
     -- ** SpDeformTimeline
-    , SpDeformTimeline_create
-    , SpDeformTimeline_setFrame
+    , spDeformTimeline_create
+    , spDeformTimeline_setFrame
     -- ** SpIkConstraintTimeline
-    , SpIkConstraintTimeline_create
-    , SpIkConstraintTimeline_setFrame
+    , spIkConstraintTimeline_create
+    , spIkConstraintTimeline_setFrame
     -- ** SpTransformConstraintTimeline
-    , SpTransformConstraintTimeline_create
-    , SpTransformConstraintTimeline_setFrame
+    , spTransformConstraintTimeline_create
+    , spTransformConstraintTimeline_setFrame
     -- ** SpPathConstraintPositionTimeline
-    , SpPathConstraintPositionTimeline_create
-    , SpPathConstraintPositionTimeline_setFrame
+    , spPathConstraintPositionTimeline_create
+    , spPathConstraintPositionTimeline_setFrame
     -- ** SpPathConstraintSpacingTimeline
-    , SpPathConstraintSpacingTimeline_create
-    , SpPathConstraintSpacingTimeline_setFrame
+    , spPathConstraintSpacingTimeline_create
+    , spPathConstraintSpacingTimeline_setFrame
     -- ** SpPathConstraintMixTimeline
-    , SpPathConstraintMixTimeline_create
-    , SpPathConstraintMixTimeline_setFrame
-    -- * Constants
+    , spPathConstraintMixTimeline_create
+    , spPathConstraintMixTimeline_setFrame
+    -- * constants
     , pattern ROTATE_PREV_TIME
     , pattern ROTATE_PREV_ROTATION
     , pattern ROTATE_ROTATION
@@ -67,13 +69,14 @@ module Spine.Raw.Animation (
     , pattern PATHCONSTRAINTPOSITION_ENTRIES
     , pattern PATHCONSTRAINTSPACING_ENTRIES
     , pattern PATHCONSTRAINTMIX_ENTRIES
-    ) where
+    )where
 --
 #include "spine/Animation.h"
 --
 import Foreign.C.Types
+import Spine.Raw.InternalStruct
 --
-
+-- functions
 foreign import ccall "spAnimation_create" spAnimation_create_FFI
     :: CString -- ^ name
     -> CInt -- ^ timelinesCount
@@ -93,8 +96,8 @@ foreign import ccall "spAnimation_apply" spAnimation_apply_FFI
     -> Ptr ( Ptr SpEvent ) -- ^ events
     -> Ptr CInt -- ^ eventsCount
     -> CFloat -- ^ alpha
-    -> CInt -- ^ setupPose :: boolean
-    -> CInt -- ^ mixingOut :: boolean
+    -> CInt -- ^ setupPose
+    -> CInt -- ^ mixingOut
     -> IO ()
 
 foreign import ccall "spTimeline_dispose" spTimeline_dispose_FFI
@@ -109,8 +112,8 @@ foreign import ccall "spTimeline_apply" spTimeline_apply_FFI
     -> Ptr ( Ptr SpEvent ) -- ^ firedEvents
     -> Ptr CInt -- ^ eventsCount
     -> CFloat -- ^ alpha
-    -> CInt -- ^ setupPose :: boolean
-    -> CInt -- ^ mixingOut :: boolean
+    -> CInt -- ^ setupPose
+    -> CInt -- ^ mixingOut
     -> IO ()
 
 foreign import ccall "spTimeline_getPropertyId" spTimeline_getPropertyId_FFI
@@ -310,6 +313,7 @@ foreign import ccall "spPathConstraintMixTimeline_setFrame" spPathConstraintMixT
     -> CFloat -- ^ translateMix
     -> IO ()
 
+-- constants
 pattern ROTATE_PREV_TIME :: CInt
 pattern ROTATE_PREV_TIME = #{const ROTATE_PREV_TIME}
 pattern ROTATE_PREV_ROTATION :: CInt
@@ -332,7 +336,4 @@ pattern PATHCONSTRAINTSPACING_ENTRIES :: CInt
 pattern PATHCONSTRAINTSPACING_ENTRIES = #{const PATHCONSTRAINTSPACING_ENTRIES}
 pattern PATHCONSTRAINTMIX_ENTRIES :: CInt
 pattern PATHCONSTRAINTMIX_ENTRIES = #{const PATHCONSTRAINTMIX_ENTRIES}
-
-
-
 --

@@ -1,6 +1,120 @@
-module Spine.Raw.AnimationState where
+module Spine.Raw.AnimationState
+    ( -- *
+      spAnimationState_create
+    , spAnimationState_dispose
+    , spAnimationState_update
+    , spAnimationState_apply
+    , spAnimationState_clearTracks
+    , spAnimationState_clearTrack
+    , spAnimationState_setAnimationByName
+    , spAnimationState_setAnimation
+    , spAnimationState_addAnimationByName
+    , spAnimationState_addAnimation
+    , spAnimationState_setEmptyAnimation
+    , spAnimationState_addEmptyAnimation
+    , spAnimationState_setEmptyAnimations
+    , spAnimationState_getCurrent
+    , spAnimationState_clearListenerNotifications
+    , spTrackEntry_getAnimationTime
+    , spAnimationState_disposeStatics
+    ) where
 --
 #include "spine/AnimationState.h"
 --
--- import Foreign.C.Types
+import Foreign.C.Types
+import Spine.Raw.InternalStruct
 --
+-- | @param data May be 0 for no mixing.
+foreign import ccall "spAnimationState_create" spAnimationState_create_FFI
+    :: Ptr SpAnimationStateData -- ^ data
+    -> IO Ptr SpAnimationState
+
+foreign import ccall "spAnimationState_dispose" spAnimationState_dispose_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> IO ()
+
+foreign import ccall "spAnimationState_update" spAnimationState_update_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CFloat -- ^ delta
+    -> IO ()
+
+foreign import ccall "spAnimationState_apply" spAnimationState_apply_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> Ptr SpSkeleton -- ^ skeleton
+    -> IO ()
+
+foreign import ccall "spAnimationState_clearTracks" spAnimationState_clearTracks_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> IO ()
+
+foreign import ccall "spAnimationState_clearTrack" spAnimationState_clearTrack_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> IO ()
+
+-- | * Set the current animation. Any queued animations are cleared.
+foreign import ccall "spAnimationState_setAnimationByName" spAnimationState_setAnimationByName_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> CString -- ^ animationName
+    -> CInt -- ^ loop :: boolean
+    -> IO Ptr SpTrackEntry
+
+foreign import ccall "spAnimationState_setAnimation" spAnimationState_setAnimation_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> Ptr SpAnimation -- ^ animation
+    -> CInt -- ^ loop :: boolean
+    -> IO Ptr SpTrackEntry
+
+-- | * Adds an animation to be played delay seconds after the current or last queued animation, taking into account any mix  * duration.
+foreign import ccall "spAnimationState_addAnimationByName" spAnimationState_addAnimationByName_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> CString -- ^ animationName
+    -> CInt -- ^ loop :: boolean
+    -> CFloat -- ^ delay
+    -> IO Ptr SpTrackEntry
+
+foreign import ccall "spAnimationState_addAnimation" spAnimationState_addAnimation_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> Ptr SpAnimation -- ^ animation
+    -> CInt -- ^ loop :: boolean
+    -> CFloat -- ^ delay
+    -> IO Ptr SpTrackEntry
+
+foreign import ccall "spAnimationState_setEmptyAnimation" spAnimationState_setEmptyAnimation_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> CFloat -- ^ mixDuration
+    -> IO Ptr SpTrackEntry
+
+foreign import ccall "spAnimationState_addEmptyAnimation" spAnimationState_addEmptyAnimation_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> CFloat -- ^ mixDuration
+    -> CFloat -- ^ delay
+    -> IO Ptr SpTrackEntry
+
+foreign import ccall "spAnimationState_setEmptyAnimations" spAnimationState_setEmptyAnimations_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CFloat -- ^ mixDuration
+    -> IO ()
+
+foreign import ccall "spAnimationState_getCurrent" spAnimationState_getCurrent_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> CInt -- ^ trackIndex
+    -> IO Ptr SpTrackEntry
+
+foreign import ccall "spAnimationState_clearListenerNotifications" spAnimationState_clearListenerNotifications_FFI
+    :: Ptr SpAnimationState -- ^ self
+    -> IO ()
+
+foreign import ccall "spTrackEntry_getAnimationTime" spTrackEntry_getAnimationTime_FFI
+    :: Ptr SpTrackEntry -- ^ entry
+    -> IO CFloat
+
+-- | * Use this to dispose static memory before your app exits to appease your memory leak detector
+foreign import ccall "spAnimationState_disposeStatics" spAnimationState_disposeStatics_FFI
+    :: IO ()
