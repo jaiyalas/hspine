@@ -1,7 +1,0 @@
-
-
-
-
-    , SpAtlasPage(..)
-    , SpAtlasRegion(..)
-    , SpAtlas(..)

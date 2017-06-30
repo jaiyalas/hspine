@@ -1,50 +1,19 @@
 
-struct spAtlasPage {
-	const spAtlas* atlas;
-	const char* name;
-	spAtlasFormat format;
-	spAtlasFilter minFilter;
-    spAtlasFilter magFilter;
-	spAtlasWrap uWrap;
-    spAtlasWrap vWrap;
+typedef struct spEventData {
+	const char* const name;
+	int intValue;
+	float floatValue;
+	const char* stringValue;
 
-	void* rendererObject;
-	int width;
-    int height;
+#ifdef __cplusplus
+	spEventData() :
+		name(0),
+		intValue(0),
+		floatValue(0),
+		stringValue(0) {
+	}
+#endif
+} spEventData;
 
-	spAtlasPage* next;
-};
-
-
-struct spAtlasRegion {
-	const char* name;
-	int x;
-    int y;
-    int width;
-    int height;
-	float u;
-    float v;
-    float u2;
-    float v2;
-	int offsetX;
-    int offsetY;
-	int originalWidth;
-    int originalHeight;
-	int index;
-	int rotate; /* boolean */
-	int flip; /* boolean */
-	int* splits;
-	int* pads;
-
-	spAtlasPage* page;
-
-	spAtlasRegion* next;
-};
-
-
-struct spAtlas {
-	spAtlasPage* pages;
-	spAtlasRegion* regions;
-
-	void* rendererObject;
-};
+spEventData* spEventData_create (const char* name);
+void spEventData_dispose (spEventData* self);

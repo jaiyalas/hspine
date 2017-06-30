@@ -23,6 +23,8 @@ parseFTOther = (many1 $ choice [alphaNum, char '_']) >>= (return . FTOther)
 parseFTypEntity :: Parsec String st FTypEntity
 parseFTypEntity = do
     parseConst
+    optional (try $ string "struct")
+    parseConst
     p1 <- many (char '*')
     parseConst
     spaces
