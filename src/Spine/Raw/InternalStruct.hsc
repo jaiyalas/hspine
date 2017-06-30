@@ -73,12 +73,11 @@ module Spine.Raw.InternalStruct(
 #include "spine/TransformConstraintData.h"
 #include "spine/VertexAttachment.h"
 --
+import Foreign.C
 import Foreign.Ptr
-import Foreign.C.Types
-import Foreign.C.String
 import Foreign.Storable
 --
-import Data.Default
+-- import Data.Default
 import Spine.Raw.InternalEnum
 --
 #if __GLASGOW_HASKELL__ < 800

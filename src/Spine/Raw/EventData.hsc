@@ -6,7 +6,9 @@ module Spine.Raw.EventData
 --
 #include "spine/EventData.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
+--
 import Spine.Raw.InternalStruct
 --
 foreign import ccall "spEventData_create" spEventData_create_FFI

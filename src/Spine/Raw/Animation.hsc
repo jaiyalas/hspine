@@ -74,7 +74,9 @@ module Spine.Raw.Animation
 --
 #include "spine/Animation.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
+--
 import Spine.Raw.InternalStruct
 --
 -- functions

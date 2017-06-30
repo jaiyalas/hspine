@@ -6,7 +6,9 @@ module Spine.Raw.BoundingBoxAttachment
 --
 #include "spine/BoundingBoxAttachment.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
+--
 import Spine.Raw.InternalStruct
 --
 

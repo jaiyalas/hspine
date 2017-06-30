@@ -5,9 +5,9 @@ module Spine.Raw.AtlasAttachmentLoader
 --
 #include "spine/AtlasAttachmentLoader.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
 --
-import Foreign.C.Types
 import Spine.Raw.InternalStruct
 --
 foreign import ccall "spAtlasAttachmentLoader_create" spAtlasAttachmentLoader_create_FFI

@@ -21,7 +21,9 @@ module Spine.Raw.AnimationState
 --
 #include "spine/AnimationState.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
+--
 import Spine.Raw.InternalStruct
 --
 -- | @param data May be 0 for no mixing.

@@ -6,7 +6,9 @@ module Spine.Raw.BoneData
 --
 #include "spine/BoneData.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
+--
 import Spine.Raw.InternalStruct
 --
 

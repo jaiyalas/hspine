@@ -12,7 +12,9 @@ module Spine.Raw.Atlas
 --
 #include "spine/Atlas.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
+--
 import Spine.Raw.InternalStruct
 --
 foreign import ccall "spAtlasPage_create" spAtlasPage_create_FFI

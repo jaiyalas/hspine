@@ -8,9 +8,9 @@ module Spine.Raw.AttachmentLoader
 --
 #include "spine/AttachmentLoader.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
 --
-import Foreign.C.Types
 import Spine.Raw.InternalStruct
 --
 foreign import ccall "spAttachmentLoader_dispose" spAttachmentLoader_dispose_FFI

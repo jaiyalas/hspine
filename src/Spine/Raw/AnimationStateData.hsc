@@ -9,7 +9,9 @@ module Spine.Raw.AnimationStateData
 --
 #include "spine/AnimationStateData.h"
 --
-import Foreign.C.Types
+import Foreign.C
+import Foreign.Ptr
+--
 import Spine.Raw.InternalStruct
 --
 foreign import ccall "spAnimationStateData_create" spAnimationStateData_create_FFI
