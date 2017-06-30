@@ -1,6 +1,19 @@
-module Spine.Raw.Event where
+module Spine.Raw.Event
+    ( -- * functions
+      spEvent_create
+    , spEvent_dispose
+    ) where
 --
 #include "spine/Event.h"
 --
--- import Foreign.C.Types
+import Foreign.C.Types
+import Spine.Raw.InternalStruct
 --
+foreign import ccall "spEvent_create" spEvent_create_FFI
+    :: CFloat -- ^ time
+    -> Ptr SpEventData -- ^ data
+    -> IO Ptr SpEvent
+
+foreign import ccall "spEvent_dispose" spEvent_dispose_FFI
+    :: Ptr SpEvent -- ^ self
+    -> IO ()

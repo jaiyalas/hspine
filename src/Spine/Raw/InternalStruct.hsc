@@ -25,8 +25,21 @@ module Spine.Raw.InternalStruct(
     , SpAtlas(..)
     , SpAtlasRegion(..)
     -- * spine/AtlasAttachmentLoader
+    , SpAtlasAttachmentLoader(..)
     -- * spine/Attachment
+    , SpAttachment(..)
     -- * spine/AttachmentLoader
+    , SpAttachmentLoader(..)
+    -- * spine/Bone
+    , SpBone(..)
+    -- * spine/BoneData
+    , SpBoneData(..)
+    -- * spine/BoundingBoxAttachment
+    , SpBoundingBoxAttachment(..)
+    -- * spine/Event
+    , SpEvent(..)
+    -- * spine/EventData
+    , SpEventData(..)
     ) where
 --
 #include "spine/Animation.h"
@@ -697,153 +710,383 @@ instance Storable SpAtlas where
         #{poke spAtlas, regions} ptr b
         #{poke spAtlas, rendererObject} ptr c
 
+-- #####################
 --  "spine/AtlasAttachmentLoader"
+-- #####################
 
+-- | SpAtlasAttachmentLoader
+data SpAtlasAttachmentLoader = SpAtlasAttachmentLoader
+    { spAtlasAttachmentLoader_super :: SpAttachmentLoader
+    , spAtlasAttachmentLoader_atlas :: Ptr SpAtlas
+    } deriving (Show, Eq)
+instance Storable SpAtlasAttachmentLoader where
+    alignment _ = #{alignment spAtlasAttachmentLoader}
+    sizeOf _    = #{size spAtlasAttachmentLoader}
+    peek ptr = do
+        a <- #{peek spAtlasAttachmentLoader, super} ptr
+        b <- #{peek spAtlasAttachmentLoader, atlas} ptr
+        return (SpAtlasAttachmentLoader a b)
+    poke ptr (SpAtlasAttachmentLoader a b) = do
+        #{poke spAtlasAttachmentLoader, super} ptr a
+        #{poke spAtlasAttachmentLoader, atlas} ptr b
 
-
+-- #####################
 --  "spine/Attachment"
+-- #####################
 
+-- | SpAttachment
+data SpAttachment = SpAttachment
+    { spAttachment_name :: CString
+    , spAttachment_type :: SpAttachmentType
+    , spAttachment_vtable :: Ptr ()
+    , spAttachment_attachmentLoader :: Ptr SpAttachmentLoader
+    } deriving (Show, Eq)
+instance Storable SpAttachment where
+    alignment _ = #{alignment spAttachment}
+    sizeOf _    = #{size spAttachment}
+    peek ptr = do
+        a <- #{peek spAttachment, name} ptr
+        b <- #{peek spAttachment, type} ptr
+        c <- #{peek spAttachment, vtable} ptr
+        d <- #{peek spAttachment, attachmentLoader} ptr
+        return (SpAttachment a b c d)
+    poke ptr (SpAttachment a b c d) = do
+        #{poke spAttachment, name} ptr a
+        #{poke spAttachment, type} ptr b
+        #{poke spAttachment, vtable} ptr c
+        #{poke spAttachment, attachmentLoader} ptr d
 
-
+-- #####################
 --  "spine/AttachmentLoader"
+-- #####################
 
+-- | SpAttachmentLoader
+data SpAttachmentLoader = SpAttachmentLoader
+    { spAttachmentLoader_error1 :: CString
+    , spAttachmentLoader_error2 :: CString
+    , spAttachmentLoader_vtable :: Ptr ()
+    } deriving (Show, Eq)
+instance Storable SpAttachmentLoader where
+    alignment _ = #{alignment spAttachmentLoader}
+    sizeOf _    = #{size spAttachmentLoader}
+    peek ptr = do
+        a <- #{peek spAttachmentLoader, error1} ptr
+        b <- #{peek spAttachmentLoader, error2} ptr
+        c <- #{peek spAttachmentLoader, vtable} ptr
+        return (SpAttachmentLoader a b c)
+    poke ptr (SpAttachmentLoader a b c) = do
+        #{poke spAttachmentLoader, error1} ptr a
+        #{poke spAttachmentLoader, error2} ptr b
+        #{poke spAttachmentLoader, vtable} ptr c
 
-
+-- #####################
 --  "spine/Bone"
+-- #####################
 
+-- | SpBone
+data SpBone = SpBone
+    { spBone_data :: Ptr SpBoneData
+    , spBone_skeleton :: Ptr SpSkeleton
+    , spBone_parent :: Ptr SpBone
+    , spBone_childrenCount :: CInt
+    , spBone_children :: Ptr ( Ptr SpBone )
+    , spBone_x :: CFloat
+    , spBone_y :: CFloat
+    , spBone_rotation :: CFloat
+    , spBone_scaleX :: CFloat
+    , spBone_scaleY :: CFloat
+    , spBone_shearX :: CFloat
+    , spBone_shearY :: CFloat
+    , spBone_ax :: CFloat
+    , spBone_ay :: CFloat
+    , spBone_arotation :: CFloat
+    , spBone_ascaleX :: CFloat
+    , spBone_ascaleY :: CFloat
+    , spBone_ashearX :: CFloat
+    , spBone_ashearY :: CFloat
+    , spBone_appliedValid :: CInt -- ^ boolean
+    , spBone_a :: CFloat
+    , spBone_b :: CFloat
+    , spBone_worldX :: CFloat
+    , spBone_c :: CFloat
+    , spBone_d :: CFloat
+    , spBone_worldY :: CFloat
+    , spBone_sorted :: CInt -- ^ boolean
+    } deriving (Show, Eq)
+instance Storable SpBone where
+    alignment _ = #{alignment spBone}
+    sizeOf _    = #{size spBone}
+    peek ptr = do
+        a <- #{peek spBone, data} ptr
+        b <- #{peek spBone, skeleton} ptr
+        c <- #{peek spBone, parent} ptr
+        d <- #{peek spBone, childrenCount} ptr
+        e <- #{peek spBone, children} ptr
+        f <- #{peek spBone, x} ptr
+        g <- #{peek spBone, y} ptr
+        h <- #{peek spBone, rotation} ptr
+        i <- #{peek spBone, scaleX} ptr
+        j <- #{peek spBone, scaleY} ptr
+        k <- #{peek spBone, shearX} ptr
+        l <- #{peek spBone, shearY} ptr
+        m <- #{peek spBone, ax} ptr
+        n <- #{peek spBone, ay} ptr
+        o <- #{peek spBone, arotation} ptr
+        p <- #{peek spBone, ascaleX} ptr
+        q <- #{peek spBone, ascaleY} ptr
+        r <- #{peek spBone, ashearX} ptr
+        s <- #{peek spBone, ashearY} ptr
+        t <- #{peek spBone, appliedValid} ptr
+        u <- #{peek spBone, a} ptr
+        v <- #{peek spBone, b} ptr
+        w <- #{peek spBone, worldX} ptr
+        x <- #{peek spBone, c} ptr
+        y <- #{peek spBone, d} ptr
+        z <- #{peek spBone, worldY} ptr
+        a2 <- #{peek spBone, sorted} ptr
+        return (SpBone a b c d e f g h i j k l m n o p q r s t u v w x y z a2)
+    poke ptr (SpBone a b c d e f g h i j k l m n o p q r s t u v w x y z a2) = do
+        #{poke spBone, data} ptr a
+        #{poke spBone, skeleton} ptr b
+        #{poke spBone, parent} ptr c
+        #{poke spBone, childrenCount} ptr d
+        #{poke spBone, children} ptr e
+        #{poke spBone, x} ptr f
+        #{poke spBone, y} ptr g
+        #{poke spBone, rotation} ptr h
+        #{poke spBone, scaleX} ptr i
+        #{poke spBone, scaleY} ptr j
+        #{poke spBone, shearX} ptr k
+        #{poke spBone, shearY} ptr l
+        #{poke spBone, ax} ptr m
+        #{poke spBone, ay} ptr n
+        #{poke spBone, arotation} ptr o
+        #{poke spBone, ascaleX} ptr p
+        #{poke spBone, ascaleY} ptr q
+        #{poke spBone, ashearX} ptr r
+        #{poke spBone, ashearY} ptr s
+        #{poke spBone, appliedValid} ptr t
+        #{poke spBone, a} ptr u
+        #{poke spBone, b} ptr v
+        #{poke spBone, worldX} ptr w
+        #{poke spBone, c} ptr x
+        #{poke spBone, d} ptr y
+        #{poke spBone, worldY} ptr z
+        #{poke spBone, sorted} ptr a2
 
-
+-- #####################
 --  "spine/BoneData"
+-- #####################
 
+-- | SpBoneData
 data SpBoneData = SpBoneData
-    { spBoneData_index    :: CInt
-    , spBoneData_name     :: CString
-    , spBoneData_parent   :: Ptr SpBoneData
-    , spBoneData_length   :: CFloat
-    , spBoneData_x        :: CFloat
-    , spBoneData_y        :: CFloat
+    { spBoneData_index :: CInt
+    , spBoneData_name :: CString
+    , spBoneData_parent :: Ptr SpBoneData
+    , spBoneData_length :: CFloat
+    , spBoneData_x :: CFloat
+    , spBoneData_y :: CFloat
     , spBoneData_rotation :: CFloat
-    , spBoneData_scaleX   :: CFloat
-    , spBoneData_scaleY   :: CFloat
-    , spBoneData_shearX   :: CFloat
-    , spBoneData_shearY   :: CFloat
-    , spBoneData_transformMode :: TransformMode
+    , spBoneData_scaleX :: CFloat
+    , spBoneData_scaleY :: CFloat
+    , spBoneData_shearX :: CFloat
+    , spBoneData_shearY :: CFloat
+    , spBoneData_transformMode :: SpTransformMode
     } deriving (Show, Eq)
 instance Storable SpBoneData where
     alignment _ = #{alignment spBoneData}
-    sizeOf _ = #{size spBoneData}
+    sizeOf _    = #{size spBoneData}
     peek ptr = do
-        i <-   #{peek spBoneData, index} ptr
-        n <-   #{peek spBoneData, name} ptr
-        p <-   #{peek spBoneData, parent} ptr
-        l <-   #{peek spBoneData, length} ptr
-        x <-   #{peek spBoneData, x} ptr
-        y <-   #{peek spBoneData, y} ptr
-        r <-   #{peek spBoneData, rotation} ptr
-        sx <-  #{peek spBoneData, scaleX} ptr
-        sy <-  #{peek spBoneData, scaleY} ptr
-        shx <- #{peek spBoneData, shearX} ptr
-        shy <- #{peek spBoneData, shearY} ptr
-        t <-   #{peek spBoneData, transformMode} ptr
-        return (SpBoneData i n p l x y r sx sy shx shy t)
-    poke ptr (SpBoneData i n p l x y r sx sy shx shy t) = do
-        #{poke spBoneData, index} ptr i
-        #{poke spBoneData, name} ptr n
-        #{poke spBoneData, parent} ptr p
-        #{poke spBoneData, length} ptr l
-        #{poke spBoneData, x} ptr x
-        #{poke spBoneData, y} ptr y
-        #{poke spBoneData, rotation} ptr r
-        #{poke spBoneData, scaleX} ptr sx
-        #{poke spBoneData, scaleY} ptr sy
-        #{poke spBoneData, shearX} ptr shx
-        #{poke spBoneData, shearY} ptr shy
-        #{poke spBoneData, transformMode} ptr t
-instance Default SpBoneData where
-    def = SpBoneData 0 nullPtr nullPtr 0 0 0 0 0 0 0 0 TRANSFORMMODE_NORMAL
+        a <- #{peek spBoneData, index} ptr
+        b <- #{peek spBoneData, name} ptr
+        c <- #{peek spBoneData, parent} ptr
+        d <- #{peek spBoneData, length} ptr
+        e <- #{peek spBoneData, x} ptr
+        f <- #{peek spBoneData, y} ptr
+        g <- #{peek spBoneData, rotation} ptr
+        h <- #{peek spBoneData, scaleX} ptr
+        i <- #{peek spBoneData, scaleY} ptr
+        j <- #{peek spBoneData, shearX} ptr
+        k <- #{peek spBoneData, shearY} ptr
+        l <- #{peek spBoneData, transformMode} ptr
+        return (SpBoneData a b c d e f g h i j k l)
+    poke ptr (SpBoneData a b c d e f g h i j k l) = do
+        #{poke spBoneData, index} ptr a
+        #{poke spBoneData, name} ptr b
+        #{poke spBoneData, parent} ptr c
+        #{poke spBoneData, length} ptr d
+        #{poke spBoneData, x} ptr e
+        #{poke spBoneData, y} ptr f
+        #{poke spBoneData, rotation} ptr g
+        #{poke spBoneData, scaleX} ptr h
+        #{poke spBoneData, scaleY} ptr i
+        #{poke spBoneData, shearX} ptr j
+        #{poke spBoneData, shearY} ptr k
+        #{poke spBoneData, transformMode} ptr l
 
--- "spine/BoneData.h"
-
-
-
+-- #####################
 -- "spine/BoundingBoxAttachment.h"
+-- #####################
 
+-- | SpBoundingBoxAttachment
+data SpBoundingBoxAttachment = SpBoundingBoxAttachment
+    { spBoundingBoxAttachment_super :: SpVertexAttachment
+    } deriving (Show, Eq)
+instance Storable SpBoundingBoxAttachment where
+    alignment _ = #{alignment spBoundingBoxAttachment}
+    sizeOf _    = #{size spBoundingBoxAttachment}
+    peek ptr = do
+        a <- #{peek spBoundingBoxAttachment, super} ptr
+        return (SpBoundingBoxAttachment a)
+    poke ptr (SpBoundingBoxAttachment a) = do
+        #{poke spBoundingBoxAttachment, super} ptr a
 
-
+-- #####################
 -- "spine/Event.h"
+-- #####################
 
+-- | SpEvent
+data SpEvent = SpEvent
+    { spEvent_data :: Ptr SpEventData
+    , spEvent_time :: CFloat
+    , spEvent_intValue :: CInt
+    , spEvent_floatValue :: CFloat
+    , spEvent_stringValue :: CString
+    } deriving (Show, Eq)
+instance Storable SpEvent where
+    alignment _ = #{alignment spEvent}
+    sizeOf _    = #{size spEvent}
+    peek ptr = do
+        a <- #{peek spEvent, data} ptr
+        b <- #{peek spEvent, time} ptr
+        c <- #{peek spEvent, intValue} ptr
+        d <- #{peek spEvent, floatValue} ptr
+        e <- #{peek spEvent, stringValue} ptr
+        return (SpEvent a b c d e)
+    poke ptr (SpEvent a b c d e) = do
+        #{poke spEvent, data} ptr a
+        #{poke spEvent, time} ptr b
+        #{poke spEvent, intValue} ptr c
+        #{poke spEvent, floatValue} ptr d
+        #{poke spEvent, stringValue} ptr e
 
-
+-- #####################
 -- "spine/EventData.h"
+-- #####################
 
+-- | SpEventData
+data SpEventData = SpEventData
+    { spEventData_name :: CString
+    , spEventData_intValue :: CInt
+    , spEventData_floatValue :: CFloat
+    , spEventData_stringValue :: CString
+    } deriving (Show, Eq)
+instance Storable SpEventData where
+    alignment _ = #{alignment spEventData}
+    sizeOf _    = #{size spEventData}
+    peek ptr = do
+        a <- #{peek spEventData, name} ptr
+        b <- #{peek spEventData, intValue} ptr
+        c <- #{peek spEventData, floatValue} ptr
+        d <- #{peek spEventData, stringValue} ptr
+        return (SpEventData a b c d)
+    poke ptr (SpEventData a b c d) = do
+        #{poke spEventData, name} ptr a
+        #{poke spEventData, intValue} ptr b
+        #{poke spEventData, floatValue} ptr c
+        #{poke spEventData, stringValue} ptr d
 
-
+-- #####################
 -- "spine/IkConstraint.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/IkConstraintData.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/MeshAttachment.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/PathAttachment.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/PathConstraint.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/PathConstraintData.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/RegionAttachment.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/Skeleton.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/SkeletonBinary.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/SkeletonBounds.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/SkeletonData.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/SkeletonJson.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/Skin.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/Slot.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/SlotData.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/TransformConstraint.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/TransformConstraintData.h"
+-- #####################
 
 
-
+-- #####################
 -- "spine/VertexAttachment.h"
+-- #####################
+
+
+
+
+
+--
