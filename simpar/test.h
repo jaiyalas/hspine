@@ -1,63 +1,234 @@
-spAtlasPage* spAtlasPage_create (spAtlas* atlas, const char* name);
-void spAtlasPage_dispose (spAtlasPage* self);
+
+typedef struct spAnimation {
+	const char* const name;
+	float duration;
+
+	int timelinesCount;
+	spTimeline** timelines;
+
+#ifdef __cplusplus
+	spAnimation() :
+		name(0),
+		duration(0),
+		timelinesCount(0),
+		timelines(0) {
+	}
+#endif
+} spAnimation;
+
+struct spTimeline {
+	const spTimelineType type;
+	const void* const vtable;
+
+#ifdef __cplusplus
+	spTimeline() :
+		type(SP_TIMELINE_SCALE),
+		vtable(0) {
+	}
+#endif
+};
 
 
-spAtlasRegion* spAtlasRegion_create ();
-void spAtlasRegion_dispose (spAtlasRegion* self);
+typedef struct spCurveTimeline {
+	spTimeline super;
+	float* curves; /* type, x, y, ... */
 
-/* Image files referenced in the atlas file will be prefixed with dir. */
-spAtlas* spAtlas_create (const char* data, int length, const char* dir, void* rendererObject);
-/* Image files referenced in the atlas file will be prefixed with the directory containing the atlas file. */
-spAtlas* spAtlas_createFromFile (const char* path, void* rendererObject);
-void spAtlas_dispose (spAtlas* atlas);
+#ifdef __cplusplus
+	spCurveTimeline() :
+		super(),
+		curves(0) {
+	}
+#endif
+} spCurveTimeline;
 
-/* Returns 0 if the region was not found. */
-spAtlasRegion* spAtlas_findRegion (const spAtlas* self, const char* name);
+typedef struct spBaseTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, angle, ... for rotate. time, x, y, ... for translate and scale. */
+	int boneIndex;
 
-
-typedef struct spAtlasPage{
-	const spAtlas* atlas;
-	const char* name;
-	spAtlasFormat format;
-	spAtlasFilter minFilter;
-	spAtlasFilter magFilter;
-	spAtlasWrap uWrap;
-	spAtlasWrap vWrap;
-	void* rendererObject;
-	int width;
-    int height;
-	spAtlasPage* next;
-} spAtlasPage;
-
-typedef struct spAtlas{
-	spAtlasPage* pages;
-	spAtlasRegion* regions;
-
-	void* rendererObject;
-} spAtlas;
+#ifdef __cplusplus
+	spBaseTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		boneIndex(0) {
+	}
+#endif
+} spBaseTimeline;
 
 
-typedef struct spAtlasRegion{
-	const char* name;
-	int x;
-	int y;
-	int width;
-	int height;
+typedef struct spColorTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, r, g, b, a, ... */
+	int slotIndex;
 
-	float u;
-	float v;
-	float u2;
-	float v2;
+#ifdef __cplusplus
+	spColorTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		slotIndex(0) {
+	}
+#endif
+} spColorTimeline;
 
-	int offsetX;
-	int offsetY;
-	int originalWidth;
-	int originalHeight;
-	int index;
-	int rotate; /* boolean */
-	int flip; /* boolean */
-	int* splits;
-	int* pads;
-	spAtlasPage* page;
-	spAtlasRegion* next;
-} spAtlasRegion;
+typedef struct spAttachmentTimeline {
+	spTimeline super;
+	int const framesCount;
+	float* const frames; /* time, ... */
+	int slotIndex;
+	const char** const attachmentNames;
+
+#ifdef __cplusplus
+	spAttachmentTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		slotIndex(0),
+		attachmentNames(0) {
+	}
+#endif
+} spAttachmentTimeline;
+
+
+typedef struct spEventTimeline {
+	spTimeline super;
+	int const framesCount;
+	float* const frames; /* time, ... */
+	spEvent** const events;
+
+#ifdef __cplusplus
+	spEventTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		events(0) {
+	}
+#endif
+} spEventTimeline;
+
+typedef struct spDrawOrderTimeline {
+	spTimeline super;
+	int const framesCount;
+	float* const frames; /* time, ... */
+	const int** const drawOrders;
+	int const slotsCount;
+
+#ifdef __cplusplus
+	spDrawOrderTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		drawOrders(0),
+		slotsCount(0) {
+	}
+#endif
+} spDrawOrderTimeline;
+
+typedef struct spDeformTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, ... */
+	int const frameVerticesCount;
+	const float** const frameVertices;
+	int slotIndex;
+	spAttachment* attachment;
+
+#ifdef __cplusplus
+	spDeformTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		frameVerticesCount(0),
+		frameVertices(0),
+		slotIndex(0) {
+	}
+#endif
+} spDeformTimeline;
+
+
+typedef struct spIkConstraintTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, mix, bendDirection, ... */
+	int ikConstraintIndex;
+
+#ifdef __cplusplus
+	spIkConstraintTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		ikConstraintIndex(0) {
+	}
+#endif
+} spIkConstraintTimeline;
+
+
+typedef struct spTransformConstraintTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
+	int transformConstraintIndex;
+
+#ifdef __cplusplus
+	spTransformConstraintTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		transformConstraintIndex(0) {
+	}
+#endif
+} spTransformConstraintTimeline;
+
+
+typedef struct spPathConstraintPositionTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
+	int pathConstraintIndex;
+
+#ifdef __cplusplus
+	spPathConstraintPositionTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		pathConstraintIndex(0) {
+	}
+#endif
+} spPathConstraintPositionTimeline;
+
+
+typedef struct spPathConstraintSpacingTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
+	int pathConstraintIndex;
+
+#ifdef __cplusplus
+	spPathConstraintSpacingTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		pathConstraintIndex(0) {
+	}
+#endif
+} spPathConstraintSpacingTimeline;
+
+
+typedef struct spPathConstraintMixTimeline {
+	spCurveTimeline super;
+	int const framesCount;
+	float* const frames; /* time, rotate mix, translate mix, scale mix, shear mix, ... */
+	int pathConstraintIndex;
+
+#ifdef __cplusplus
+	spPathConstraintMixTimeline() :
+		super(),
+		framesCount(0),
+		frames(0),
+		pathConstraintIndex(0) {
+	}
+#endif
+} spPathConstraintMixTimeline;

@@ -46,7 +46,7 @@ instance PrintHsc StructEntity where
         ++ softtab 1 ++ "{ "
         ++  ( drop 6
             $ concat
-            $ map (((softtab 1 ++ ", ")++).(++ nline).printHsc)
+            $ map (((softtab 1 ++ ", ")++).(++ nline).(structName++).("_"++).printHsc)
             sfs)
         ++ softtab 1 ++ "} deriving (Show, Eq)"
         ++ nline
