@@ -18,7 +18,7 @@ parseFTChars :: Parsec String st FTyp
 parseFTChars = string "char*" >> return FTChars
 --
 parseFTOther :: Parsec String st FTyp
-parseFTOther = many1 letter >>= (return.FTOther)
+parseFTOther = (many1 $ choice [alphaNum, char '_']) >>= (return . FTOther)
 --
 parseFTypEntity :: Parsec String st FTypEntity
 parseFTypEntity = do
@@ -55,7 +55,7 @@ parseFieldEntity :: Parsec String st FieldEntity
 parseFieldEntity = do
     ty <- parseFTypEntity
     spaces
-    name <- (many1 letter)
+    name <- many1 $ choice [alphaNum, char '_']
     spaces
     char ';'
     spaces
@@ -95,7 +95,7 @@ parseFunctionEntity = do
     spaces
     ret <- parseFTypEntity
     spaces
-    fname <- many1 $ choice [letter, char '_']
+    fname <- many1 $ choice [alphaNum, char '_']
     spaces
     char '('
     spaces

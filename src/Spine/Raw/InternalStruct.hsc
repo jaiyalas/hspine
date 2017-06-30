@@ -20,7 +20,13 @@ module Spine.Raw.InternalStruct(
     , SpAnimationState(..)
     -- * spine/AnimationStateData
     , SpAnimationStateData(..)
-    -- *
+    -- * spine/Atlas
+    , SpAtlasPage(..)
+    , SpAtlas(..)
+    , SpAtlasRegion(..)
+    -- * spine/AtlasAttachmentLoader
+    -- * spine/Attachment
+    -- * spine/AttachmentLoader
     ) where
 --
 #include "spine/Animation.h"
@@ -73,10 +79,10 @@ import Spine.Raw.InternalEnum
 
 -- | SpAnimation
 data SpAnimation = SpAnimation
-    { name :: CString
-    , duration :: CFloat
-    , timelinesCount :: CInt
-    , timelines :: Ptr ( Ptr SpTimeline )
+    { animationName :: CString
+    , animationDuration :: CFloat
+    , animationTimelinesCount :: CInt
+    , animationTimelines :: Ptr ( Ptr SpTimeline )
     } deriving (Show, Eq)
 instance Storable SpAnimation where
     alignment _ = #{alignment spAnimation}
@@ -95,7 +101,7 @@ instance Storable SpAnimation where
 
 -- | SpTimeline
 data SpTimeline = SpTimeline
-    { type :: SpTimelineType
+    { timelineType :: SpTimelineType
     , vtable :: Ptr ()
     } deriving (Show, Eq)
 instance Storable SpTimeline where
@@ -111,8 +117,8 @@ instance Storable SpTimeline where
 
 -- | SpCurveTimeline
 data SpCurveTimeline = SpCurveTimeline
-    { super :: SpTimeline
-    , curves :: Ptr CFloat -- ^ type, x, y, ...
+    { ct_super :: SpTimeline
+    , ct_curves :: Ptr CFloat -- ^ type, x, y, ...
     } deriving (Show, Eq)
 instance Storable SpCurveTimeline where
     alignment _ = #{alignment spCurveTimeline}
@@ -127,10 +133,10 @@ instance Storable SpCurveTimeline where
 
 -- | SpBaseTimeline
 data SpBaseTimeline = SpBaseTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, angle, ... for rotate. time, x, y, ... for translate and scale.
-    , boneIndex :: CInt
+    { bt_super :: SpCurveTimeline
+    , bt_framesCount :: CInt
+    , bt_frames :: Ptr CFloat -- ^ time, angle, ... for rotate. time, x, y, ... for translate and scale.
+    , bt_boneIndex :: CInt
     } deriving (Show, Eq)
 instance Storable SpBaseTimeline where
     alignment _ = #{alignment spBaseTimeline}
@@ -161,10 +167,10 @@ type SpShearTimeline     = SpBaseTimeline
 
 -- | SpColorTimeline
 data SpColorTimeline = SpColorTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, r, g, b, a, ...
-    , slotIndex :: CInt
+    { ct_super :: SpCurveTimeline
+    , ct_framesCount :: CInt
+    , ct_frames :: Ptr CFloat -- ^ time, r, g, b, a, ...
+    , ct_slotIndex :: CInt
     } deriving (Show, Eq)
 instance Storable SpColorTimeline where
     alignment _ = #{alignment spColorTimeline}
@@ -183,11 +189,11 @@ instance Storable SpColorTimeline where
 
 -- | SpAttachmentTimeline
 data SpAttachmentTimeline = SpAttachmentTimeline
-    { super :: SpTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, ...
-    , slotIndex :: CInt
-    , attachmentNames :: Ptr CString
+    { at_super :: SpTimeline
+    , at_framesCount :: CInt
+    , at_frames :: Ptr CFloat -- ^ time, ...
+    , at_slotIndex :: CInt
+    , at_attachmentNames :: Ptr CString
     } deriving (Show, Eq)
 instance Storable SpAttachmentTimeline where
     alignment _ = #{alignment spAttachmentTimeline}
@@ -208,10 +214,10 @@ instance Storable SpAttachmentTimeline where
 
 -- | SpEventTimeline
 data SpEventTimeline = SpEventTimeline
-    { super :: SpTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, ...
-    , events :: Ptr ( Ptr SpEvent )
+    { et_super :: SpTimeline
+    , et_framesCount :: CInt
+    , et_frames :: Ptr CFloat -- ^ time, ...
+    , et_events :: Ptr ( Ptr SpEvent )
     } deriving (Show, Eq)
 instance Storable SpEventTimeline where
     alignment _ = #{alignment spEventTimeline}
@@ -230,11 +236,11 @@ instance Storable SpEventTimeline where
 
 -- | SpDrawOrderTimeline
 data SpDrawOrderTimeline = SpDrawOrderTimeline
-    { super :: SpTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, ...
-    , drawOrders :: Ptr ( Ptr CInt )
-    , slotsCount :: CInt
+    { dot_super :: SpTimeline
+    , dot_framesCount :: CInt
+    , dot_frames :: Ptr CFloat -- ^ time, ...
+    , dot_drawOrders :: Ptr ( Ptr CInt )
+    , dot_slotsCount :: CInt
     } deriving (Show, Eq)
 instance Storable SpDrawOrderTimeline where
     alignment _ = #{alignment spDrawOrderTimeline}
@@ -255,13 +261,13 @@ instance Storable SpDrawOrderTimeline where
 
 -- | SpDeformTimeline
 data SpDeformTimeline = SpDeformTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, ...
-    , frameVerticesCount :: CInt
-    , frameVertices :: Ptr ( Ptr CFloat )
-    , slotIndex :: CInt
-    , attachment :: Ptr SpAttachment
+    { dt_super :: SpCurveTimeline
+    , dt_framesCount :: CInt
+    , dt_frames :: Ptr CFloat -- ^ time, ...
+    , dt_frameVerticesCount :: CInt
+    , dt_frameVertices :: Ptr ( Ptr CFloat )
+    , dt_slotIndex :: CInt
+    , dt_attachment :: Ptr SpAttachment
     } deriving (Show, Eq)
 instance Storable SpDeformTimeline where
     alignment _ = #{alignment spDeformTimeline}
@@ -286,10 +292,10 @@ instance Storable SpDeformTimeline where
 
 -- | SpIkConstraintTimeline
 data SpIkConstraintTimeline = SpIkConstraintTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, mix, bendDirection, ...
-    , ikConstraintIndex :: CInt
+    { ict_super :: SpCurveTimeline
+    , ict_framesCount :: CInt
+    , ict_frames :: Ptr CFloat -- ^ time, mix, bendDirection, ...
+    , ict_ikConstraintIndex :: CInt
     } deriving (Show, Eq)
 instance Storable SpIkConstraintTimeline where
     alignment _ = #{alignment spIkConstraintTimeline}
@@ -308,10 +314,10 @@ instance Storable SpIkConstraintTimeline where
 
 -- | SpTransformConstraintTimeline
 data SpTransformConstraintTimeline = SpTransformConstraintTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
-    , transformConstraintIndex :: CInt
+    { tct_super :: SpCurveTimeline
+    , tct_framesCount :: CInt
+    , tct_frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
+    , tct_transformConstraintIndex :: CInt
     } deriving (Show, Eq)
 instance Storable SpTransformConstraintTimeline where
     alignment _ = #{alignment spTransformConstraintTimeline}
@@ -330,10 +336,10 @@ instance Storable SpTransformConstraintTimeline where
 
 -- | SpPathConstraintPositionTimeline
 data SpPathConstraintPositionTimeline = SpPathConstraintPositionTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
-    , pathConstraintIndex :: CInt
+    { pcpt_super :: SpCurveTimeline
+    , pcpt_framesCount :: CInt
+    , pcpt_frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
+    , pcpt_pathConstraintIndex :: CInt
     } deriving (Show, Eq)
 instance Storable SpPathConstraintPositionTimeline where
     alignment _ = #{alignment spPathConstraintPositionTimeline}
@@ -352,10 +358,10 @@ instance Storable SpPathConstraintPositionTimeline where
 
 -- | SpPathConstraintSpacingTimeline
 data SpPathConstraintSpacingTimeline = SpPathConstraintSpacingTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
-    , pathConstraintIndex :: CInt
+    { pcst_super :: SpCurveTimeline
+    , pcst_framesCount :: CInt
+    , pcst_frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
+    , pcst_pathConstraintIndex :: CInt
     } deriving (Show, Eq)
 instance Storable SpPathConstraintSpacingTimeline where
     alignment _ = #{alignment spPathConstraintSpacingTimeline}
@@ -374,10 +380,10 @@ instance Storable SpPathConstraintSpacingTimeline where
 
 -- | SpPathConstraintMixTimeline
 data SpPathConstraintMixTimeline = SpPathConstraintMixTimeline
-    { super :: SpCurveTimeline
-    , framesCount :: CInt
-    , frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
-    , pathConstraintIndex :: CInt
+    { pcmt_super :: SpCurveTimeline
+    , pcmt_framesCount :: CInt
+    , pcmt_frames :: Ptr CFloat -- ^ time, rotate mix, translate mix, scale mix, shear mix, ...
+    , pcmt_pathConstraintIndex :: CInt
     } deriving (Show, Eq)
 instance Storable SpPathConstraintMixTimeline where
     alignment _ = #{alignment spPathConstraintMixTimeline}
@@ -410,35 +416,35 @@ type SpAnimationStateListener
 
 -- | SpTrackEntry
 data SpTrackEntry = SpTrackEntry
-    { animation :: Ptr SpAnimation
-    , next :: Ptr SpTrackEntry
-    , mixingFrom :: Ptr SpTrackEntry
-    , listener :: SpAnimationStateListener
-    , trackIndex :: CInt
-    , loop :: CInt -- ^ boolean
-    , eventThreshold :: CFloat
-    , attachmentThreshold :: CFloat
-    , drawOrderThreshold :: CFloat
-    , animationStart :: CFloat
-    , animationEnd :: CFloat
-    , animationLast :: CFloat
-    , nextAnimationLast :: CFloat
-    , delay :: CFloat
-    , trackTime :: CFloat
-    , trackLast :: CFloat
-    , nextTrackLast :: CFloat
-    , trackEnd :: CFloat
-    , timeScale :: CFloat
-    , alpha :: CFloat
-    , mixTime :: CFloat
-    , mixDuration :: CFloat
-    , mixAlpha :: CFloat
-    , timelinesFirst :: Ptr CInt -- ^ boolean
-    , timelinesFirstCount :: CInt
-    , timelinesRotation :: Ptr CFloat
-    , timelinesRotationCount :: CInt
-    , rendererObject :: Ptr ()
-    , userData :: Ptr ()
+    { te_animation :: Ptr SpAnimation
+    , te_next :: Ptr SpTrackEntry
+    , te_mixingFrom :: Ptr SpTrackEntry
+    , te_listener :: SpAnimationStateListener
+    , te_trackIndex :: CInt
+    , te_loop :: CInt -- ^ boolean
+    , te_eventThreshold :: CFloat
+    , te_attachmentThreshold :: CFloat
+    , te_drawOrderThreshold :: CFloat
+    , te_animationStart :: CFloat
+    , te_animationEnd :: CFloat
+    , te_animationLast :: CFloat
+    , te_nextAnimationLast :: CFloat
+    , te_delay :: CFloat
+    , te_trackTime :: CFloat
+    , te_trackLast :: CFloat
+    , te_nextTrackLast :: CFloat
+    , te_trackEnd :: CFloat
+    , te_timeScale :: CFloat
+    , te_alpha :: CFloat
+    , te_mixTime :: CFloat
+    , te_mixDuration :: CFloat
+    , te_mixAlpha :: CFloat
+    , te_timelinesFirst :: Ptr CInt -- ^ boolean
+    , te_timelinesFirstCount :: CInt
+    , te_timelinesRotation :: Ptr CFloat
+    , te_timelinesRotationCount :: CInt
+    , te_rendererObject :: Ptr ()
+    , te_userData :: Ptr ()
     } deriving (Show, Eq)
 instance Storable SpTrackEntry where
     alignment _ = #{alignment spTrackEntry}
@@ -507,12 +513,12 @@ instance Storable SpTrackEntry where
 
 -- | SpAnimationState
 data SpAnimationState = SpAnimationState
-    { data :: Ptr SpAnimationStateData
-    , tracksCount :: CInt
-    , tracks :: Ptr ( Ptr SpTrackEntry )
-    , listener :: SpAnimationStateListener
-    , timeScale :: CFloat
-    , rendererObject :: Ptr ()
+    { at_stateData :: Ptr SpAnimationStateData
+    , at_tracksCount :: CInt
+    , at_tracks :: Ptr ( Ptr SpTrackEntry )
+    , at_listener :: SpAnimationStateListener
+    , at_timeScale :: CFloat
+    , at_rendererObject :: Ptr ()
     } deriving (Show, Eq)
 instance Storable SpAnimationState where
     alignment _ = #{alignment spAnimationState}
@@ -560,7 +566,137 @@ instance Storable SpAnimationStateData where
 --  "spine/Atlas"
 -- #####################
 
+-- | SpAtlasPage
+data SpAtlasPage = SpAtlasPage
+    { ap_atlas :: Ptr SpAtlas
+    , ap_name :: CString
+    , ap_format :: SpAtlasFormat
+    , ap_minFilter :: SpAtlasFilter
+    , ap_magFilter :: SpAtlasFilter
+    , ap_uWrap :: SpAtlasWrap
+    , ap_vWrap :: SpAtlasWrap
+    , ap_rendererObject :: Ptr ()
+    , ap_width :: CInt
+    , ap_height :: CInt
+    , ap_next :: Ptr SpAtlasPage
+    } deriving (Show, Eq)
+instance Storable SpAtlasPage where
+    alignment _ = #{alignment spAtlasPage}
+    sizeOf _    = #{size spAtlasPage}
+    peek ptr = do
+        a <- #{peek spAtlasPage, atlas} ptr
+        b <- #{peek spAtlasPage, name} ptr
+        c <- #{peek spAtlasPage, format} ptr
+        d <- #{peek spAtlasPage, minFilter} ptr
+        e <- #{peek spAtlasPage, magFilter} ptr
+        f <- #{peek spAtlasPage, uWrap} ptr
+        g <- #{peek spAtlasPage, vWrap} ptr
+        h <- #{peek spAtlasPage, rendererObject} ptr
+        i <- #{peek spAtlasPage, width} ptr
+        j <- #{peek spAtlasPage, height} ptr
+        k <- #{peek spAtlasPage, next} ptr
+        return (SpAtlasPage a b c d e f g h i j k)
+    poke ptr (SpAtlasPage a b c d e f g h i j k) = do
+        #{poke spAtlasPage, atlas} ptr a
+        #{poke spAtlasPage, name} ptr b
+        #{poke spAtlasPage, format} ptr c
+        #{poke spAtlasPage, minFilter} ptr d
+        #{poke spAtlasPage, magFilter} ptr e
+        #{poke spAtlasPage, uWrap} ptr f
+        #{poke spAtlasPage, vWrap} ptr g
+        #{poke spAtlasPage, rendererObject} ptr h
+        #{poke spAtlasPage, width} ptr i
+        #{poke spAtlasPage, height} ptr j
+        #{poke spAtlasPage, next} ptr k
 
+-- | SpAtlas
+data SpAtlas = SpAtlas
+    { atlasPages :: Ptr SpAtlasPage
+    , atlasRegions :: Ptr SpAtlasRegion
+    , atlasRendererObject :: Ptr ()
+    } deriving (Show, Eq)
+instance Storable SpAtlas where
+    alignment _ = #{alignment spAtlas}
+    sizeOf _    = #{size spAtlas}
+    peek ptr = do
+        a <- #{peek spAtlas, pages} ptr
+        b <- #{peek spAtlas, regions} ptr
+        c <- #{peek spAtlas, rendererObject} ptr
+        return (SpAtlas a b c)
+    poke ptr (SpAtlas a b c) = do
+        #{poke spAtlas, pages} ptr a
+        #{poke spAtlas, regions} ptr b
+        #{poke spAtlas, rendererObject} ptr c
+
+-- | SpAtlasRegion
+data SpAtlasRegion = SpAtlasRegion
+    { ar_name :: CString
+    , ar_x :: CInt
+    , ar_y :: CInt
+    , ar_width :: CInt
+    , ar_height :: CInt
+    , ar_u :: CFloat
+    , ar_v :: CFloat
+    , ar_u2 :: CFloat
+    , ar_v2 :: CFloat
+    , ar_offsetX :: CInt
+    , ar_offsetY :: CInt
+    , ar_originalWidth :: CInt
+    , ar_originalHeight :: CInt
+    , ar_index :: CInt
+    , ar_rotate :: CInt -- ^ boolean
+    , ar_flip :: CInt -- ^ boolean
+    , ar_splits :: Ptr CInt
+    , ar_pads :: Ptr CInt
+    , ar_page :: Ptr SpAtlasPage
+    , ar_next :: Ptr SpAtlasRegion
+    } deriving (Show, Eq)
+instance Storable SpAtlasRegion where
+    alignment _ = #{alignment spAtlasRegion}
+    sizeOf _    = #{size spAtlasRegion}
+    peek ptr = do
+        a <- #{peek spAtlasRegion, name} ptr
+        b <- #{peek spAtlasRegion, x} ptr
+        c <- #{peek spAtlasRegion, y} ptr
+        d <- #{peek spAtlasRegion, width} ptr
+        e <- #{peek spAtlasRegion, height} ptr
+        f <- #{peek spAtlasRegion, u} ptr
+        g <- #{peek spAtlasRegion, v} ptr
+        h <- #{peek spAtlasRegion, u2} ptr
+        i <- #{peek spAtlasRegion, v2} ptr
+        j <- #{peek spAtlasRegion, offsetX} ptr
+        k <- #{peek spAtlasRegion, offsetY} ptr
+        l <- #{peek spAtlasRegion, originalWidth} ptr
+        m <- #{peek spAtlasRegion, originalHeight} ptr
+        n <- #{peek spAtlasRegion, index} ptr
+        o <- #{peek spAtlasRegion, rotate} ptr
+        p <- #{peek spAtlasRegion, flip} ptr
+        q <- #{peek spAtlasRegion, splits} ptr
+        r <- #{peek spAtlasRegion, pads} ptr
+        s <- #{peek spAtlasRegion, page} ptr
+        t <- #{peek spAtlasRegion, next} ptr
+        return (SpAtlasRegion a b c d e f g h i j k l m n o p q r s t)
+    poke ptr (SpAtlasRegion a b c d e f g h i j k l m n o p q r s t) = do
+        #{poke spAtlasRegion, name} ptr a
+        #{poke spAtlasRegion, x} ptr b
+        #{poke spAtlasRegion, y} ptr c
+        #{poke spAtlasRegion, width} ptr d
+        #{poke spAtlasRegion, height} ptr e
+        #{poke spAtlasRegion, u} ptr f
+        #{poke spAtlasRegion, v} ptr g
+        #{poke spAtlasRegion, u2} ptr h
+        #{poke spAtlasRegion, v2} ptr i
+        #{poke spAtlasRegion, offsetX} ptr j
+        #{poke spAtlasRegion, offsetY} ptr k
+        #{poke spAtlasRegion, originalWidth} ptr l
+        #{poke spAtlasRegion, originalHeight} ptr m
+        #{poke spAtlasRegion, index} ptr n
+        #{poke spAtlasRegion, rotate} ptr o
+        #{poke spAtlasRegion, flip} ptr p
+        #{poke spAtlasRegion, splits} ptr q
+        #{poke spAtlasRegion, pads} ptr r
+        #{poke spAtlasRegion, page} ptr s
+        #{poke spAtlasRegion, next} ptr t
 
 --  "spine/AtlasAttachmentLoader"
 

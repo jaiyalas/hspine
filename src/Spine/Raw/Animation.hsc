@@ -1,3 +1,4 @@
+{-# LANGUAGE PatternSynonyms #-}
 module Spine.Raw.Animation
     (
     -- * functions
