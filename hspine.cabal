@@ -56,8 +56,11 @@ library
         spine-c
     ghc-options: -w
     exposed-modules:
-        -- Spine
         --
+        Spine
+        -- -- -- -- --
+        Spine.Exp
+        -- -- -- -- --
         Spine.Raw
         -- Spine.Raw.InternalTest
         --
@@ -99,8 +102,17 @@ library
     -- -- -- -- -- -- -- -- -- -- -- --
     build-depends:       base >= 4.7 && < 5
                  ,       data-default
+                 ,       sdl2 >= 2.2
     -- -- -- -- -- -- -- -- -- -- -- --
     build-tools:         hsc2hs
+--
+-- executable main
+--   hs-source-dirs:      app
+--   main-is:             Main.hs
+--   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+--   default-language:    Haskell2010
+--   build-depends: base
+--                , hspine
 --
 test-suite test
     type:                exitcode-stdio-1.0
