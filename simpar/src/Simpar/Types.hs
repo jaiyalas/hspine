@@ -29,8 +29,11 @@ data ConstantEntity = ConstantEntity
 data FTyp
     = FTInt
     | FTFloat
-    | FTVoid
+    | FTShort
     | FTChars
+    | FTUInt
+    | FTUShort
+    | FTVoid
     | FTOther String
     deriving (Eq, Show)
 --

@@ -5,8 +5,17 @@ import Text.Parsec
 import Simpar.Types
 import Simpar.Print
 --
+parseFTShort :: Parsec String st FTyp
+parseFTShort = string "short" >> return FTShort
+--
+parseFTUShort :: Parsec String st FTyp
+parseFTUShort = string "unsigned short" >> return FTUShort
+--
 parseFTInt :: Parsec String st FTyp
 parseFTInt = string "int" >> return FTInt
+--
+parseFTUInt :: Parsec String st FTyp
+parseFTUInt = string "unsigned int" >> return FTUInt
 --
 parseFTFloat :: Parsec String st FTyp
 parseFTFloat = string "float" >> return FTFloat
@@ -29,10 +38,13 @@ parseFTypEntity = do
     parseConst
     spaces
     t <- choice [ try parseFTInt
+                , try parseFTShort
                 , try parseFTFloat
                 , try parseFTVoid
                 , try parseFTChars
-                , try parseFTOther ]
+                , try parseFTUInt
+                , try parseFTUShort
+                , parseFTOther ]
     spaces
     parseConst
     p2 <- many (char '*')

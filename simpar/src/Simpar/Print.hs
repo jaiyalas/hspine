@@ -63,10 +63,13 @@ instance PrintHsc FTypEntity where
     printHsc (FTypEntity n ty) =
         "Ptr ( " ++ (printHsc (FTypEntity (n-1) ty)) ++ " )"
 instance PrintHsc FTyp where
-    printHsc FTInt   = "CInt"
-    printHsc FTFloat = "CFloat"
+    printHsc FTInt    = "CInt"
+    printHsc FTShort  = "CShort"
+    printHsc FTUInt   = "CUInt"
+    printHsc FTUShort = "CUShort"
+    printHsc FTFloat  = "CFloat"
     printHsc FTChars  = "CString"
-    printHsc FTVoid  = "()"
+    printHsc FTVoid   = "()"
     printHsc (FTOther (x : xs)) = (toUpper x) : xs
 --
 instance PrintHsc ArgEntity where
