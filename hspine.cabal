@@ -54,12 +54,12 @@ library
         /Users/jaiyalas/Project/hspine/spine-c/build
     extra-libraries:
         spine-c
-    ghc-options: -Wall
+    ghc-options: -w
     exposed-modules:
-        Spine
+        -- Spine
         --
         Spine.Raw
-        Spine.Raw.InternalTest
+        -- Spine.Raw.InternalTest
         --
         Spine.Raw.InternalEnum
         Spine.Raw.InternalStruct

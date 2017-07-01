@@ -1,6 +1,6 @@
 module Spine.Raw.AtlasAttachmentLoader
     ( -- * functions
-      spAtlasAttachmentLoader_create
+      spAtlasAttachmentLoader_create_FFI
     ) where
 --
 #include "spine/AtlasAttachmentLoader.h"
@@ -12,4 +12,4 @@ import Spine.Raw.InternalStruct
 --
 foreign import ccall "spAtlasAttachmentLoader_create" spAtlasAttachmentLoader_create_FFI
     :: Ptr SpAtlas -- ^ atlas
-    -> IO Ptr SpAtlasAttachmentLoader
+    -> IO (Ptr SpAtlasAttachmentLoader)

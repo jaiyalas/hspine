@@ -1,7 +1,7 @@
 module Spine.Raw.EventData
     ( -- * functions
-      spEventData_create
-    , spEventData_dispose
+      spEventData_create_FFI
+    , spEventData_dispose_FFI
     ) where
 --
 #include "spine/EventData.h"
@@ -13,7 +13,7 @@ import Spine.Raw.InternalStruct
 --
 foreign import ccall "spEventData_create" spEventData_create_FFI
     :: CString -- ^ name
-    -> IO Ptr SpEventData
+    -> IO (Ptr SpEventData)
 
 foreign import ccall "spEventData_dispose" spEventData_dispose_FFI
     :: Ptr SpEventData -- ^ self

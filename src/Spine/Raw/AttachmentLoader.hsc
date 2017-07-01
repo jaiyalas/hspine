@@ -1,9 +1,9 @@
 module Spine.Raw.AttachmentLoader
     ( -- * functions
-      spAttachmentLoader_dispose
-    , spAttachmentLoader_createAttachment
-    , spAttachmentLoader_configureAttachment
-    , spAttachmentLoader_disposeAttachment
+      spAttachmentLoader_dispose_FFI
+    , spAttachmentLoader_createAttachment_FFI
+    , spAttachmentLoader_configureAttachment_FFI
+    , spAttachmentLoader_disposeAttachment_FFI
     ) where
 --
 #include "spine/AttachmentLoader.h"
@@ -11,6 +11,7 @@ module Spine.Raw.AttachmentLoader
 import Foreign.C
 import Foreign.Ptr
 --
+import Spine.Raw.InternalEnum
 import Spine.Raw.InternalStruct
 --
 foreign import ccall "spAttachmentLoader_dispose" spAttachmentLoader_dispose_FFI
@@ -24,7 +25,7 @@ foreign import ccall "spAttachmentLoader_createAttachment" spAttachmentLoader_cr
     -> SpAttachmentType -- ^ type
     -> CString -- ^ name
     -> CString -- ^ path
-    -> IO Ptr SpAttachment
+    -> IO (Ptr SpAttachment)
 
 -- | Called after the attachment has been fully configured.
 foreign import ccall "spAttachmentLoader_configureAttachment" spAttachmentLoader_configureAttachment_FFI

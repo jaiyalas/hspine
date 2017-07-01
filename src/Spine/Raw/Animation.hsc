@@ -3,61 +3,61 @@ module Spine.Raw.Animation
     (
     -- * functions
     -- ** SpAnimation
-      spAnimation_create
-    , spAnimation_dispose
-    , spAnimation_apply
+      spAnimation_create_FFI
+    , spAnimation_dispose_FFI
+    , spAnimation_apply_FFI
     -- ** SpTimeline
-    , spTimeline_dispose
-    , spTimeline_apply
-    , spTimeline_getPropertyId
+    , spTimeline_dispose_FFI
+    , spTimeline_apply_FFI
+    , spTimeline_getPropertyId_FFI
     -- ** SpCurveTimeline
-    , spCurveTimeline_setLinear
-    , spCurveTimeline_setStepped
-    , spCurveTimeline_setCurve
-    , spCurveTimeline_getCurvePercent
+    , spCurveTimeline_setLinear_FFI
+    , spCurveTimeline_setStepped_FFI
+    , spCurveTimeline_setCurve_FFI
+    , spCurveTimeline_getCurvePercent_FFI
     -- ** SpBaseTimeline
     -- *** SpRotateTimeline
-    , spRotateTimeline_create
-    , spRotateTimeline_setFrame
+    , spRotateTimeline_create_FFI
+    , spRotateTimeline_setFrame_FFI
     -- *** SpTranslateTimeline
-    , spTranslateTimeline_create
-    , spTranslateTimeline_setFrame
+    , spTranslateTimeline_create_FFI
+    , spTranslateTimeline_setFrame_FFI
     -- *** SpScaleTimeline
-    , spScaleTimeline_create
-    , spScaleTimeline_setFrame
+    , spScaleTimeline_create_FFI
+    , spScaleTimeline_setFrame_FFI
     -- *** SpShearTimeline
-    , spShearTimeline_create
-    , spShearTimeline_setFrame
+    , spShearTimeline_create_FFI
+    , spShearTimeline_setFrame_FFI
     -- ** SpColorTimeline
-    , spColorTimeline_create
-    , spColorTimeline_setFrame
+    , spColorTimeline_create_FFI
+    , spColorTimeline_setFrame_FFI
     -- ** SpAttachmentTimeline
-    , spAttachmentTimeline_create
-    , spAttachmentTimeline_setFrame
+    , spAttachmentTimeline_create_FFI
+    , spAttachmentTimeline_setFrame_FFI
     -- ** SpEventTimeline
-    , spEventTimeline_create
-    , spEventTimeline_setFrame
+    , spEventTimeline_create_FFI
+    , spEventTimeline_setFrame_FFI
     -- ** SpDrawOrderTimeline
-    , spDrawOrderTimeline_create
-    , spDrawOrderTimeline_setFrame
+    , spDrawOrderTimeline_create_FFI
+    , spDrawOrderTimeline_setFrame_FFI
     -- ** SpDeformTimeline
-    , spDeformTimeline_create
-    , spDeformTimeline_setFrame
+    , spDeformTimeline_create_FFI
+    , spDeformTimeline_setFrame_FFI
     -- ** SpIkConstraintTimeline
-    , spIkConstraintTimeline_create
-    , spIkConstraintTimeline_setFrame
+    , spIkConstraintTimeline_create_FFI
+    , spIkConstraintTimeline_setFrame_FFI
     -- ** SpTransformConstraintTimeline
-    , spTransformConstraintTimeline_create
-    , spTransformConstraintTimeline_setFrame
+    , spTransformConstraintTimeline_create_FFI
+    , spTransformConstraintTimeline_setFrame_FFI
     -- ** SpPathConstraintPositionTimeline
-    , spPathConstraintPositionTimeline_create
-    , spPathConstraintPositionTimeline_setFrame
+    , spPathConstraintPositionTimeline_create_FFI
+    , spPathConstraintPositionTimeline_setFrame_FFI
     -- ** SpPathConstraintSpacingTimeline
-    , spPathConstraintSpacingTimeline_create
-    , spPathConstraintSpacingTimeline_setFrame
+    , spPathConstraintSpacingTimeline_create_FFI
+    , spPathConstraintSpacingTimeline_setFrame_FFI
     -- ** SpPathConstraintMixTimeline
-    , spPathConstraintMixTimeline_create
-    , spPathConstraintMixTimeline_setFrame
+    , spPathConstraintMixTimeline_create_FFI
+    , spPathConstraintMixTimeline_setFrame_FFI
     -- * constants
     , pattern ROTATE_PREV_TIME
     , pattern ROTATE_PREV_ROTATION
@@ -83,7 +83,7 @@ import Spine.Raw.InternalStruct
 foreign import ccall "spAnimation_create" spAnimation_create_FFI
     :: CString -- ^ name
     -> CInt -- ^ timelinesCount
-    -> IO Ptr SpAnimation
+    -> IO (Ptr SpAnimation)
 
 foreign import ccall "spAnimation_dispose" spAnimation_dispose_FFI
     :: Ptr SpAnimation -- ^ self
@@ -151,7 +151,7 @@ foreign import ccall "spCurveTimeline_getCurvePercent" spCurveTimeline_getCurveP
 
 foreign import ccall "spRotateTimeline_create" spRotateTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpRotateTimeline
+    -> IO (Ptr SpRotateTimeline)
 
 foreign import ccall "spRotateTimeline_setFrame" spRotateTimeline_setFrame_FFI
     :: Ptr SpRotateTimeline -- ^ self
@@ -162,7 +162,7 @@ foreign import ccall "spRotateTimeline_setFrame" spRotateTimeline_setFrame_FFI
 
 foreign import ccall "spTranslateTimeline_create" spTranslateTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpTranslateTimeline
+    -> IO (Ptr SpTranslateTimeline)
 
 foreign import ccall "spTranslateTimeline_setFrame" spTranslateTimeline_setFrame_FFI
     :: Ptr SpTranslateTimeline -- ^ self
@@ -174,7 +174,7 @@ foreign import ccall "spTranslateTimeline_setFrame" spTranslateTimeline_setFrame
 
 foreign import ccall "spScaleTimeline_create" spScaleTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpScaleTimeline
+    -> IO (Ptr SpScaleTimeline)
 
 foreign import ccall "spScaleTimeline_setFrame" spScaleTimeline_setFrame_FFI
     :: Ptr SpScaleTimeline -- ^ self
@@ -186,7 +186,7 @@ foreign import ccall "spScaleTimeline_setFrame" spScaleTimeline_setFrame_FFI
 
 foreign import ccall "spShearTimeline_create" spShearTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpShearTimeline
+    -> IO (Ptr SpShearTimeline)
 
 foreign import ccall "spShearTimeline_setFrame" spShearTimeline_setFrame_FFI
     :: Ptr SpShearTimeline -- ^ self
@@ -198,7 +198,7 @@ foreign import ccall "spShearTimeline_setFrame" spShearTimeline_setFrame_FFI
 
 foreign import ccall "spColorTimeline_create" spColorTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpColorTimeline
+    -> IO (Ptr SpColorTimeline)
 
 foreign import ccall "spColorTimeline_setFrame" spColorTimeline_setFrame_FFI
     :: Ptr SpColorTimeline -- ^ self
@@ -212,7 +212,7 @@ foreign import ccall "spColorTimeline_setFrame" spColorTimeline_setFrame_FFI
 
 foreign import ccall "spAttachmentTimeline_create" spAttachmentTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpAttachmentTimeline
+    -> IO (Ptr SpAttachmentTimeline)
 
 -- | @param attachmentName May be 0.
 foreign import ccall "spAttachmentTimeline_setFrame" spAttachmentTimeline_setFrame_FFI
@@ -224,7 +224,7 @@ foreign import ccall "spAttachmentTimeline_setFrame" spAttachmentTimeline_setFra
 
 foreign import ccall "spEventTimeline_create" spEventTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpEventTimeline
+    -> IO (Ptr SpEventTimeline)
 
 foreign import ccall "spEventTimeline_setFrame" spEventTimeline_setFrame_FFI
     :: Ptr SpEventTimeline -- ^ self
@@ -235,7 +235,7 @@ foreign import ccall "spEventTimeline_setFrame" spEventTimeline_setFrame_FFI
 foreign import ccall "spDrawOrderTimeline_create" spDrawOrderTimeline_create_FFI
     :: CInt -- ^ framesCount
     -> CInt -- ^ slotsCount
-    -> IO Ptr SpDrawOrderTimeline
+    -> IO (Ptr SpDrawOrderTimeline)
 
 foreign import ccall "spDrawOrderTimeline_setFrame" spDrawOrderTimeline_setFrame_FFI
     :: Ptr SpDrawOrderTimeline -- ^ self
@@ -247,7 +247,7 @@ foreign import ccall "spDrawOrderTimeline_setFrame" spDrawOrderTimeline_setFrame
 foreign import ccall "spDeformTimeline_create" spDeformTimeline_create_FFI
     :: CInt -- ^ framesCount
     -> CInt -- ^ frameVerticesCount
-    -> IO Ptr SpDeformTimeline
+    -> IO (Ptr SpDeformTimeline)
 
 foreign import ccall "spDeformTimeline_setFrame" spDeformTimeline_setFrame_FFI
     :: Ptr SpDeformTimeline -- ^ self
@@ -258,7 +258,7 @@ foreign import ccall "spDeformTimeline_setFrame" spDeformTimeline_setFrame_FFI
 
 foreign import ccall "spIkConstraintTimeline_create" spIkConstraintTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpIkConstraintTimeline
+    -> IO (Ptr SpIkConstraintTimeline)
 
 foreign import ccall "spIkConstraintTimeline_setFrame" spIkConstraintTimeline_setFrame_FFI
     :: Ptr SpIkConstraintTimeline -- ^ self
@@ -270,7 +270,7 @@ foreign import ccall "spIkConstraintTimeline_setFrame" spIkConstraintTimeline_se
 
 foreign import ccall "spTransformConstraintTimeline_create" spTransformConstraintTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpTransformConstraintTimeline
+    -> IO (Ptr SpTransformConstraintTimeline)
 
 foreign import ccall "spTransformConstraintTimeline_setFrame" spTransformConstraintTimeline_setFrame_FFI
     :: Ptr SpTransformConstraintTimeline -- ^ self
@@ -284,7 +284,7 @@ foreign import ccall "spTransformConstraintTimeline_setFrame" spTransformConstra
 
 foreign import ccall "spPathConstraintPositionTimeline_create" spPathConstraintPositionTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpPathConstraintPositionTimeline
+    -> IO (Ptr SpPathConstraintPositionTimeline)
 
 foreign import ccall "spPathConstraintPositionTimeline_setFrame" spPathConstraintPositionTimeline_setFrame_FFI
     :: Ptr SpPathConstraintPositionTimeline -- ^ self
@@ -295,7 +295,7 @@ foreign import ccall "spPathConstraintPositionTimeline_setFrame" spPathConstrain
 
 foreign import ccall "spPathConstraintSpacingTimeline_create" spPathConstraintSpacingTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpPathConstraintSpacingTimeline
+    -> IO (Ptr SpPathConstraintSpacingTimeline)
 
 foreign import ccall "spPathConstraintSpacingTimeline_setFrame" spPathConstraintSpacingTimeline_setFrame_FFI
     :: Ptr SpPathConstraintSpacingTimeline -- ^ self
@@ -306,7 +306,7 @@ foreign import ccall "spPathConstraintSpacingTimeline_setFrame" spPathConstraint
 
 foreign import ccall "spPathConstraintMixTimeline_create" spPathConstraintMixTimeline_create_FFI
     :: CInt -- ^ framesCount
-    -> IO Ptr SpPathConstraintMixTimeline
+    -> IO (Ptr SpPathConstraintMixTimeline)
 
 foreign import ccall "spPathConstraintMixTimeline_setFrame" spPathConstraintMixTimeline_setFrame_FFI
     :: Ptr SpPathConstraintMixTimeline -- ^ self

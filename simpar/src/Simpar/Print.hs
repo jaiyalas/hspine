@@ -89,8 +89,9 @@ instance PrintHsc FunctionEntity where
         ++fname ++"_FFI"
         ++ nline ++ softtab 1 ++ ":: "
         ++ concat (map ((++ nline ++ softtab 1 ++ "-> ").printHsc) argTypes)
-        ++ "IO "
+        ++ "IO ( "
         ++ printHsc rttype
+        ++ " )"
         ++ nline
 --
 instance PrintHsc ConstantEntity where
@@ -116,6 +117,7 @@ printModel_function (x:xs) =
     softtab 1
     ++ ", "
     ++ fname x
+    ++ "_FFI"
     ++ nline
     ++ printModel_function xs
 --

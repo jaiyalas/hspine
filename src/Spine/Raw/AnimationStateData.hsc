@@ -1,10 +1,10 @@
 module Spine.Raw.AnimationStateData
     ( -- * functions
-      spAnimationStateData_create
-    , spAnimationStateData_dispose
-    , spAnimationStateData_setMixByName
-    , spAnimationStateData_setMix
-    , spAnimationStateData_getMix
+      spAnimationStateData_create_FFI
+    , spAnimationStateData_dispose_FFI
+    , spAnimationStateData_setMixByName_FFI
+    , spAnimationStateData_setMix_FFI
+    , spAnimationStateData_getMix_FFI
     ) where
 --
 #include "spine/AnimationStateData.h"
@@ -16,7 +16,7 @@ import Spine.Raw.InternalStruct
 --
 foreign import ccall "spAnimationStateData_create" spAnimationStateData_create_FFI
     :: Ptr SpSkeletonData -- ^ skeletonData
-    -> IO Ptr SpAnimationStateData
+    -> IO (Ptr SpAnimationStateData)
 
 foreign import ccall "spAnimationStateData_dispose" spAnimationStateData_dispose_FFI
     :: Ptr SpAnimationStateData -- ^ self

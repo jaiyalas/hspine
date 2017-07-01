@@ -1,7 +1,7 @@
 module Spine.Raw.BoneData
     ( -- * functions
-      spBoneData_create
-    , spBoneData_dispose
+      spBoneData_create_FFI
+    , spBoneData_dispose_FFI
     ) where
 --
 #include "spine/BoneData.h"
@@ -16,7 +16,7 @@ foreign import ccall "spBoneData_create" spBoneData_create_FFI
     :: CInt -- ^ index
     -> CString -- ^ name
     -> Ptr SpBoneData -- ^ parent
-    -> IO Ptr SpBoneData
+    -> IO (Ptr SpBoneData)
 
 foreign import ccall "spBoneData_dispose" spBoneData_dispose_FFI
     :: Ptr SpBoneData -- ^ self

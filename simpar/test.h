@@ -1,19 +1,16 @@
 
-typedef struct spEventData {
-	const char* const name;
-	int intValue;
-	float floatValue;
-	const char* stringValue;
 
-#ifdef __cplusplus
-	spEventData() :
-		name(0),
-		intValue(0),
-		floatValue(0),
-		stringValue(0) {
-	}
-#endif
-} spEventData;
+typedef struct spVertexAttachment {
+	spAttachment super;
 
-spEventData* spEventData_create (const char* name);
-void spEventData_dispose (spEventData* self);
+	int bonesCount;
+	int* bones;
+
+	int verticesCount;
+	float* vertices;
+
+	int worldVerticesLength;
+} spVertexAttachment;
+
+void spVertexAttachment_computeWorldVertices (spVertexAttachment* self, spSlot* slot, float* worldVertices);
+void spVertexAttachment_computeWorldVertices1 (spVertexAttachment* self, int start, int count, spSlot* slot, float* worldVertices, int offset);

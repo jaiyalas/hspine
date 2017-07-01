@@ -14,6 +14,11 @@ module Spine.Raw.InternalStruct(
     , SpPathConstraintPositionTimeline(..)
     , SpPathConstraintSpacingTimeline(..)
     , SpPathConstraintMixTimeline(..)
+    -- ** extended SpBaseTimeline
+    , SpRotateTimeline
+    , SpTranslateTimeline
+    , SpScaleTimeline
+    , SpShearTimeline
     -- * spine/AnimationState
     , SpAnimationStateListener
     , SpTrackEntry(..)
@@ -40,6 +45,43 @@ module Spine.Raw.InternalStruct(
     , SpEvent(..)
     -- * spine/EventData
     , SpEventData(..)
+    -- * spine/IkConstraint.h
+    , SpIkConstraint(..)
+    -- * spine/IkConstraintData.h
+    , SpIkConstraintData(..)
+    -- * spine/MeshAttachment.h
+    , SpMeshAttachment(..)
+    -- * spine/PathAttachment.h
+    , SpPathAttachment(..)
+    -- * spine/PathConstraint.h
+    , SpPathConstraint(..)
+    -- * spine/PathConstraintData.h
+    , SpPathConstraintData(..)
+    -- * spine/RegionAttachment.h
+    , SpRegionAttachment(..)
+    -- * spine/Skeleton.h
+    , SpSkeleton(..)
+    -- * spine/SkeletonBinary.h
+    , SpSkeletonBinary(..)
+    -- * spine/SkeletonBounds.h
+    , SpPolygon(..)
+    , SpSkeletonBounds(..)
+    -- * spine/SkeletonData.h
+    , SpSkeletonData(..)
+    -- * spine/SkeletonJson.h
+    , SpSkeletonJson(..)
+    -- * spine/Skin.h
+    , SpSkin(..)
+    -- * spine/Slot.h
+    , SpSlot(..)
+    -- * spine/SlotData.h
+    , SpSlotData(..)
+    -- * spine/TransformConstraint.h
+    , SpTransformConstraint(..)
+    -- * spine/TransformConstraintData.h
+    , SpTransformConstraintData(..)
+    -- * spine/VertexAttachment.h
+    , SpVertexAttachment(..)
     ) where
 --
 #include "spine/Animation.h"
@@ -430,7 +472,7 @@ data SpTrackEntry = SpTrackEntry
     { spTrackEntry_animation :: Ptr SpAnimation
     , spTrackEntry_next :: Ptr SpTrackEntry
     , spTrackEntry_mixingFrom :: Ptr SpTrackEntry
-    , spTrackEntry_listener :: SpAnimationStateListener
+    , spTrackEntry_listener :: FunPtr SpAnimationStateListener
     , spTrackEntry_trackIndex :: CInt
     , spTrackEntry_loop :: CInt -- ^ boolean
     , spTrackEntry_eventThreshold :: CFloat
@@ -527,7 +569,7 @@ data SpAnimationState = SpAnimationState
     { spAnimationState_data :: Ptr SpAnimationStateData
     , spAnimationState_tracksCount :: CInt
     , spAnimationState_tracks :: Ptr ( Ptr SpTrackEntry )
-    , spAnimationState_listener :: SpAnimationStateListener
+    , spAnimationState_listener :: FunPtr SpAnimationStateListener
     , spAnimationState_timeScale :: CFloat
     , spAnimationState_rendererObject :: Ptr ()
     } deriving (Show, Eq)
@@ -999,93 +1041,892 @@ instance Storable SpEventData where
 -- "spine/IkConstraint.h"
 -- #####################
 
+-- | SpIkConstraint
+data SpIkConstraint = SpIkConstraint
+    { spIkConstraint_data :: Ptr SpIkConstraintData
+    , spIkConstraint_bonesCount :: CInt
+    , spIkConstraint_bones :: Ptr ( Ptr SpBone )
+    , spIkConstraint_target :: Ptr SpBone
+    , spIkConstraint_bendDirection :: CInt
+    , spIkConstraint_mix :: CFloat
+    } deriving (Show, Eq)
+instance Storable SpIkConstraint where
+    alignment _ = #{alignment spIkConstraint}
+    sizeOf _    = #{size spIkConstraint}
+    peek ptr = do
+        a <- #{peek spIkConstraint, data} ptr
+        b <- #{peek spIkConstraint, bonesCount} ptr
+        c <- #{peek spIkConstraint, bones} ptr
+        d <- #{peek spIkConstraint, target} ptr
+        e <- #{peek spIkConstraint, bendDirection} ptr
+        f <- #{peek spIkConstraint, mix} ptr
+        return (SpIkConstraint a b c d e f)
+    poke ptr (SpIkConstraint a b c d e f) = do
+        #{poke spIkConstraint, data} ptr a
+        #{poke spIkConstraint, bonesCount} ptr b
+        #{poke spIkConstraint, bones} ptr c
+        #{poke spIkConstraint, target} ptr d
+        #{poke spIkConstraint, bendDirection} ptr e
+        #{poke spIkConstraint, mix} ptr f
 
 -- #####################
 -- "spine/IkConstraintData.h"
 -- #####################
 
+-- | SpIkConstraintData
+data SpIkConstraintData = SpIkConstraintData
+    { spIkConstraintData_name :: CString
+    , spIkConstraintData_order :: CInt
+    , spIkConstraintData_bonesCount :: CInt
+    , spIkConstraintData_bones :: Ptr ( Ptr SpBoneData )
+    , spIkConstraintData_target :: Ptr SpBoneData
+    , spIkConstraintData_bendDirection :: CInt
+    , spIkConstraintData_mix :: CFloat
+    } deriving (Show, Eq)
+instance Storable SpIkConstraintData where
+    alignment _ = #{alignment spIkConstraintData}
+    sizeOf _    = #{size spIkConstraintData}
+    peek ptr = do
+        a <- #{peek spIkConstraintData, name} ptr
+        b <- #{peek spIkConstraintData, order} ptr
+        c <- #{peek spIkConstraintData, bonesCount} ptr
+        d <- #{peek spIkConstraintData, bones} ptr
+        e <- #{peek spIkConstraintData, target} ptr
+        f <- #{peek spIkConstraintData, bendDirection} ptr
+        g <- #{peek spIkConstraintData, mix} ptr
+        return (SpIkConstraintData a b c d e f g)
+    poke ptr (SpIkConstraintData a b c d e f g) = do
+        #{poke spIkConstraintData, name} ptr a
+        #{poke spIkConstraintData, order} ptr b
+        #{poke spIkConstraintData, bonesCount} ptr c
+        #{poke spIkConstraintData, bones} ptr d
+        #{poke spIkConstraintData, target} ptr e
+        #{poke spIkConstraintData, bendDirection} ptr f
+        #{poke spIkConstraintData, mix} ptr g
 
 -- #####################
 -- "spine/MeshAttachment.h"
 -- #####################
 
+-- | SpMeshAttachment
+data SpMeshAttachment = SpMeshAttachment
+    { spMeshAttachment_super :: SpVertexAttachment
+    , spMeshAttachment_rendererObject :: Ptr ()
+    , spMeshAttachment_regionOffsetX :: CInt -- ^ Pixels stripped from the bottom left, unrotated.
+    , spMeshAttachment_regionOffsetY :: CInt -- ^ Pixels stripped from the bottom left, unrotated.
+    , spMeshAttachment_regionWidth :: CInt -- ^ Unrotated, stripped pixel size.
+    , spMeshAttachment_regionHeight :: CInt -- ^ Unrotated, stripped pixel size.
+    , spMeshAttachment_regionOriginalWidth :: CInt -- ^ Unrotated, unstripped pixel size.
+    , spMeshAttachment_regionOriginalHeight :: CInt -- ^ Unrotated, unstripped pixel size.
+    , spMeshAttachment_regionU :: CFloat
+    , spMeshAttachment_regionV :: CFloat
+    , spMeshAttachment_regionU2 :: CFloat
+    , spMeshAttachment_regionV2 :: CFloat
+    , spMeshAttachment_regionRotate :: CInt -- ^ bool
+    , spMeshAttachment_path :: CString
+    , spMeshAttachment_regionUVs :: Ptr CFloat
+    , spMeshAttachment_uvs :: Ptr CFloat
+    , spMeshAttachment_trianglesCount :: CInt
+    , spMeshAttachment_triangles :: Ptr CUShort
+    , spMeshAttachment_r :: CFloat
+    , spMeshAttachment_g :: CFloat
+    , spMeshAttachment_b :: CFloat
+    , spMeshAttachment_a :: CFloat
+    , spMeshAttachment_hullLength :: CInt
+    , spMeshAttachment_parentMesh :: Ptr SpMeshAttachment
+    , spMeshAttachment_inheritDeform :: CInt -- ^ boolean
+    , spMeshAttachment_edgesCount :: CInt -- ^ Nonessential.
+    , spMeshAttachment_edges :: Ptr CInt -- ^ Nonessential.
+    , spMeshAttachment_width :: CFloat -- ^ Nonessential.
+    , spMeshAttachment_height :: CFloat -- ^ Nonessential.
+    } deriving (Show, Eq)
+instance Storable SpMeshAttachment where
+    alignment _ = #{alignment spMeshAttachment}
+    sizeOf _    = #{size spMeshAttachment}
+    peek ptr = do
+        a <- #{peek spMeshAttachment, super} ptr
+        b <- #{peek spMeshAttachment, rendererObject} ptr
+        c <- #{peek spMeshAttachment, regionOffsetX} ptr
+        d <- #{peek spMeshAttachment, regionOffsetY} ptr
+        e <- #{peek spMeshAttachment, regionWidth} ptr
+        f <- #{peek spMeshAttachment, regionHeight} ptr
+        g <- #{peek spMeshAttachment, regionOriginalWidth} ptr
+        h <- #{peek spMeshAttachment, regionOriginalHeight} ptr
+        i <- #{peek spMeshAttachment, regionU} ptr
+        j <- #{peek spMeshAttachment, regionV} ptr
+        k <- #{peek spMeshAttachment, regionU2} ptr
+        l <- #{peek spMeshAttachment, regionV2} ptr
+        m <- #{peek spMeshAttachment, regionRotate} ptr
+        n <- #{peek spMeshAttachment, path} ptr
+        o <- #{peek spMeshAttachment, regionUVs} ptr
+        p <- #{peek spMeshAttachment, uvs} ptr
+        q <- #{peek spMeshAttachment, trianglesCount} ptr
+        r <- #{peek spMeshAttachment, triangles} ptr
+        s <- #{peek spMeshAttachment, r} ptr
+        t <- #{peek spMeshAttachment, g} ptr
+        u <- #{peek spMeshAttachment, b} ptr
+        v <- #{peek spMeshAttachment, a} ptr
+        w <- #{peek spMeshAttachment, hullLength} ptr
+        x <- #{peek spMeshAttachment, parentMesh} ptr
+        y <- #{peek spMeshAttachment, inheritDeform} ptr
+        z <- #{peek spMeshAttachment, edgesCount} ptr
+        a2 <- #{peek spMeshAttachment, edges} ptr
+        b2 <- #{peek spMeshAttachment, width} ptr
+        c2 <- #{peek spMeshAttachment, height} ptr
+        return (SpMeshAttachment a b c d e f g h i j k l m n o p q r s t u v w x y z a2 b2 c2)
+    poke ptr (SpMeshAttachment a b c d e f g h i j k l m n o p q r s t u v w x y z a2 b2 c2) = do
+        #{poke spMeshAttachment, super} ptr a
+        #{poke spMeshAttachment, rendererObject} ptr b
+        #{poke spMeshAttachment, regionOffsetX} ptr c
+        #{poke spMeshAttachment, regionOffsetY} ptr d
+        #{poke spMeshAttachment, regionWidth} ptr e
+        #{poke spMeshAttachment, regionHeight} ptr f
+        #{poke spMeshAttachment, regionOriginalWidth} ptr g
+        #{poke spMeshAttachment, regionOriginalHeight} ptr h
+        #{poke spMeshAttachment, regionU} ptr i
+        #{poke spMeshAttachment, regionV} ptr j
+        #{poke spMeshAttachment, regionU2} ptr k
+        #{poke spMeshAttachment, regionV2} ptr l
+        #{poke spMeshAttachment, regionRotate} ptr m
+        #{poke spMeshAttachment, path} ptr n
+        #{poke spMeshAttachment, regionUVs} ptr o
+        #{poke spMeshAttachment, uvs} ptr p
+        #{poke spMeshAttachment, trianglesCount} ptr q
+        #{poke spMeshAttachment, triangles} ptr r
+        #{poke spMeshAttachment, r} ptr s
+        #{poke spMeshAttachment, g} ptr t
+        #{poke spMeshAttachment, b} ptr u
+        #{poke spMeshAttachment, a} ptr v
+        #{poke spMeshAttachment, hullLength} ptr w
+        #{poke spMeshAttachment, parentMesh} ptr x
+        #{poke spMeshAttachment, inheritDeform} ptr y
+        #{poke spMeshAttachment, edgesCount} ptr z
+        #{poke spMeshAttachment, edges} ptr a2
+        #{poke spMeshAttachment, width} ptr b2
+        #{poke spMeshAttachment, height} ptr c2
 
 -- #####################
 -- "spine/PathAttachment.h"
 -- #####################
 
+-- | SpPathAttachment
+data SpPathAttachment = SpPathAttachment
+    { spPathAttachment_super :: SpVertexAttachment
+    , spPathAttachment_lengthsLength :: CInt
+    , spPathAttachment_lengths :: Ptr CFloat
+    , spPathAttachment_closed :: CInt -- ^ boolean
+    , spPathAttachment_constantSpeed :: CInt
+    } deriving (Show, Eq)
+instance Storable SpPathAttachment where
+    alignment _ = #{alignment spPathAttachment}
+    sizeOf _    = #{size spPathAttachment}
+    peek ptr = do
+        a <- #{peek spPathAttachment, super} ptr
+        b <- #{peek spPathAttachment, lengthsLength} ptr
+        c <- #{peek spPathAttachment, lengths} ptr
+        d <- #{peek spPathAttachment, closed} ptr
+        e <- #{peek spPathAttachment, constantSpeed} ptr
+        return (SpPathAttachment a b c d e)
+    poke ptr (SpPathAttachment a b c d e) = do
+        #{poke spPathAttachment, super} ptr a
+        #{poke spPathAttachment, lengthsLength} ptr b
+        #{poke spPathAttachment, lengths} ptr c
+        #{poke spPathAttachment, closed} ptr d
+        #{poke spPathAttachment, constantSpeed} ptr e
 
 -- #####################
 -- "spine/PathConstraint.h"
 -- #####################
 
+-- | SpPathConstraint
+data SpPathConstraint = SpPathConstraint
+    { spPathConstraint_data :: Ptr SpPathConstraintData
+    , spPathConstraint_bonesCount :: CInt
+    , spPathConstraint_bones :: Ptr ( Ptr SpBone )
+    , spPathConstraint_target :: Ptr SpSlot
+    , spPathConstraint_position :: CFloat
+    , spPathConstraint_spacing :: CFloat
+    , spPathConstraint_rotateMix :: CFloat
+    , spPathConstraint_translateMix :: CFloat
+    , spPathConstraint_spacesCount :: CInt
+    , spPathConstraint_spaces :: Ptr CFloat
+    , spPathConstraint_positionsCount :: CInt
+    , spPathConstraint_positions :: Ptr CFloat
+    , spPathConstraint_worldCount :: CInt
+    , spPathConstraint_world :: Ptr CFloat
+    , spPathConstraint_curvesCount :: CInt
+    , spPathConstraint_curves :: Ptr CFloat
+    , spPathConstraint_lengthsCount :: CInt
+    , spPathConstraint_lengths :: Ptr CFloat
+    , spPathConstraint_segments :: Ptr CFloat -- ^ float segments[10]
+    } deriving (Show, Eq)
+instance Storable SpPathConstraint where
+    alignment _ = #{alignment spPathConstraint}
+    sizeOf _    = #{size spPathConstraint}
+    peek ptr = do
+        a <- #{peek spPathConstraint, data} ptr
+        b <- #{peek spPathConstraint, bonesCount} ptr
+        c <- #{peek spPathConstraint, bones} ptr
+        d <- #{peek spPathConstraint, target} ptr
+        e <- #{peek spPathConstraint, position} ptr
+        f <- #{peek spPathConstraint, spacing} ptr
+        g <- #{peek spPathConstraint, rotateMix} ptr
+        h <- #{peek spPathConstraint, translateMix} ptr
+        i <- #{peek spPathConstraint, spacesCount} ptr
+        j <- #{peek spPathConstraint, spaces} ptr
+        k <- #{peek spPathConstraint, positionsCount} ptr
+        l <- #{peek spPathConstraint, positions} ptr
+        m <- #{peek spPathConstraint, worldCount} ptr
+        n <- #{peek spPathConstraint, world} ptr
+        o <- #{peek spPathConstraint, curvesCount} ptr
+        p <- #{peek spPathConstraint, curves} ptr
+        q <- #{peek spPathConstraint, lengthsCount} ptr
+        r <- #{peek spPathConstraint, lengths} ptr
+        s <- #{peek spPathConstraint, segments} ptr
+        return (SpPathConstraint a b c d e f g h i j k l m n o p q r s)
+    poke ptr (SpPathConstraint a b c d e f g h i j k l m n o p q r s) = do
+        #{poke spPathConstraint, data} ptr a
+        #{poke spPathConstraint, bonesCount} ptr b
+        #{poke spPathConstraint, bones} ptr c
+        #{poke spPathConstraint, target} ptr d
+        #{poke spPathConstraint, position} ptr e
+        #{poke spPathConstraint, spacing} ptr f
+        #{poke spPathConstraint, rotateMix} ptr g
+        #{poke spPathConstraint, translateMix} ptr h
+        #{poke spPathConstraint, spacesCount} ptr i
+        #{poke spPathConstraint, spaces} ptr j
+        #{poke spPathConstraint, positionsCount} ptr k
+        #{poke spPathConstraint, positions} ptr l
+        #{poke spPathConstraint, worldCount} ptr m
+        #{poke spPathConstraint, world} ptr n
+        #{poke spPathConstraint, curvesCount} ptr o
+        #{poke spPathConstraint, curves} ptr p
+        #{poke spPathConstraint, lengthsCount} ptr q
+        #{poke spPathConstraint, lengths} ptr r
+        #{poke spPathConstraint, segments} ptr s
 
 -- #####################
 -- "spine/PathConstraintData.h"
 -- #####################
 
+-- | SpPathConstraintData
+data SpPathConstraintData = SpPathConstraintData
+    { spPathConstraintData_name :: CString
+    , spPathConstraintData_order :: CInt
+    , spPathConstraintData_bonesCount :: CInt
+    , spPathConstraintData_bones :: Ptr ( Ptr SpBoneData )
+    , spPathConstraintData_target :: Ptr SpSlotData
+    , spPathConstraintData_positionMode :: SpPositionMode
+    , spPathConstraintData_spacingMode :: SpSpacingMode
+    , spPathConstraintData_rotateMode :: SpRotateMode
+    , spPathConstraintData_offsetRotation :: CFloat
+    , spPathConstraintData_position :: CFloat
+    , spPathConstraintData_spacing :: CFloat
+    , spPathConstraintData_rotateMix :: CFloat
+    , spPathConstraintData_translateMix :: CFloat
+    } deriving (Show, Eq)
+instance Storable SpPathConstraintData where
+    alignment _ = #{alignment spPathConstraintData}
+    sizeOf _    = #{size spPathConstraintData}
+    peek ptr = do
+        a <- #{peek spPathConstraintData, name} ptr
+        b <- #{peek spPathConstraintData, order} ptr
+        c <- #{peek spPathConstraintData, bonesCount} ptr
+        d <- #{peek spPathConstraintData, bones} ptr
+        e <- #{peek spPathConstraintData, target} ptr
+        f <- #{peek spPathConstraintData, positionMode} ptr
+        g <- #{peek spPathConstraintData, spacingMode} ptr
+        h <- #{peek spPathConstraintData, rotateMode} ptr
+        i <- #{peek spPathConstraintData, offsetRotation} ptr
+        j <- #{peek spPathConstraintData, position} ptr
+        k <- #{peek spPathConstraintData, spacing} ptr
+        l <- #{peek spPathConstraintData, rotateMix} ptr
+        m <- #{peek spPathConstraintData, translateMix} ptr
+        return (SpPathConstraintData a b c d e f g h i j k l m)
+    poke ptr (SpPathConstraintData a b c d e f g h i j k l m) = do
+        #{poke spPathConstraintData, name} ptr a
+        #{poke spPathConstraintData, order} ptr b
+        #{poke spPathConstraintData, bonesCount} ptr c
+        #{poke spPathConstraintData, bones} ptr d
+        #{poke spPathConstraintData, target} ptr e
+        #{poke spPathConstraintData, positionMode} ptr f
+        #{poke spPathConstraintData, spacingMode} ptr g
+        #{poke spPathConstraintData, rotateMode} ptr h
+        #{poke spPathConstraintData, offsetRotation} ptr i
+        #{poke spPathConstraintData, position} ptr j
+        #{poke spPathConstraintData, spacing} ptr k
+        #{poke spPathConstraintData, rotateMix} ptr l
+        #{poke spPathConstraintData, translateMix} ptr m
 
 -- #####################
 -- "spine/RegionAttachment.h"
 -- #####################
 
+-- | SpRegionAttachment
+data SpRegionAttachment = SpRegionAttachment
+    { spRegionAttachment_super :: SpAttachment
+    , spRegionAttachment_path :: CString
+    , spRegionAttachment_x :: CFloat
+    , spRegionAttachment_y :: CFloat
+    , spRegionAttachment_scaleX :: CFloat
+    , spRegionAttachment_scaleY :: CFloat
+    , spRegionAttachment_rotation :: CFloat
+    , spRegionAttachment_width :: CFloat
+    , spRegionAttachment_height :: CFloat
+    , spRegionAttachment_r :: CFloat
+    , spRegionAttachment_g :: CFloat
+    , spRegionAttachment_b :: CFloat
+    , spRegionAttachment_a :: CFloat
+    , spRegionAttachment_rendererObject :: Ptr ()
+    , spRegionAttachment_regionOffsetX :: CInt -- ^ Pixels stripped from the bottom left, unrotated.
+    , spRegionAttachment_regionOffsetY :: CInt -- ^ Pixels stripped from the bottom left, unrotated.
+    , spRegionAttachment_regionWidth :: CInt -- ^ Unrotated, stripped pixel size.
+    , spRegionAttachment_regionHeight :: CInt -- ^ Unrotated, stripped pixel size.
+    , spRegionAttachment_regionOriginalWidth :: CInt -- ^ Unrotated, unstripped pixel size.
+    , spRegionAttachment_regionOriginalHeight :: CInt -- ^ Unrotated, unstripped pixel size.
+    , spRegionAttachment_offset :: Ptr CFloat -- ^ float offset[8]
+    , spRegionAttachment_uvs :: Ptr CFloat -- ^ float uvs[8]
+    } deriving (Show, Eq)
+instance Storable SpRegionAttachment where
+    alignment _ = #{alignment spRegionAttachment}
+    sizeOf _    = #{size spRegionAttachment}
+    peek ptr = do
+        a <- #{peek spRegionAttachment, super} ptr
+        b <- #{peek spRegionAttachment, path} ptr
+        c <- #{peek spRegionAttachment, x} ptr
+        d <- #{peek spRegionAttachment, y} ptr
+        e <- #{peek spRegionAttachment, scaleX} ptr
+        f <- #{peek spRegionAttachment, scaleY} ptr
+        g <- #{peek spRegionAttachment, rotation} ptr
+        h <- #{peek spRegionAttachment, width} ptr
+        i <- #{peek spRegionAttachment, height} ptr
+        j <- #{peek spRegionAttachment, r} ptr
+        k <- #{peek spRegionAttachment, g} ptr
+        l <- #{peek spRegionAttachment, b} ptr
+        m <- #{peek spRegionAttachment, a} ptr
+        n <- #{peek spRegionAttachment, rendererObject} ptr
+        o <- #{peek spRegionAttachment, regionOffsetX} ptr
+        p <- #{peek spRegionAttachment, regionOffsetY} ptr
+        q <- #{peek spRegionAttachment, regionWidth} ptr
+        r <- #{peek spRegionAttachment, regionHeight} ptr
+        s <- #{peek spRegionAttachment, regionOriginalWidth} ptr
+        t <- #{peek spRegionAttachment, regionOriginalHeight} ptr
+        u <- #{peek spRegionAttachment, offset} ptr
+        v <- #{peek spRegionAttachment, uvs} ptr
+        return (SpRegionAttachment a b c d e f g h i j k l m n o p q r s t u v)
+    poke ptr (SpRegionAttachment a b c d e f g h i j k l m n o p q r s t u v) = do
+        #{poke spRegionAttachment, super} ptr a
+        #{poke spRegionAttachment, path} ptr b
+        #{poke spRegionAttachment, x} ptr c
+        #{poke spRegionAttachment, y} ptr d
+        #{poke spRegionAttachment, scaleX} ptr e
+        #{poke spRegionAttachment, scaleY} ptr f
+        #{poke spRegionAttachment, rotation} ptr g
+        #{poke spRegionAttachment, width} ptr h
+        #{poke spRegionAttachment, height} ptr i
+        #{poke spRegionAttachment, r} ptr j
+        #{poke spRegionAttachment, g} ptr k
+        #{poke spRegionAttachment, b} ptr l
+        #{poke spRegionAttachment, a} ptr m
+        #{poke spRegionAttachment, rendererObject} ptr n
+        #{poke spRegionAttachment, regionOffsetX} ptr o
+        #{poke spRegionAttachment, regionOffsetY} ptr p
+        #{poke spRegionAttachment, regionWidth} ptr q
+        #{poke spRegionAttachment, regionHeight} ptr r
+        #{poke spRegionAttachment, regionOriginalWidth} ptr s
+        #{poke spRegionAttachment, regionOriginalHeight} ptr t
+        #{poke spRegionAttachment, offset} ptr u
+        #{poke spRegionAttachment, uvs} ptr v
 
 -- #####################
 -- "spine/Skeleton.h"
 -- #####################
 
+-- | SpSkeleton
+data SpSkeleton = SpSkeleton
+    { spSkeleton_data :: Ptr SpSkeletonData
+    , spSkeleton_bonesCount :: CInt
+    , spSkeleton_bones :: Ptr ( Ptr SpBone )
+    , spSkeleton_root :: Ptr SpBone
+    , spSkeleton_slotsCount :: CInt
+    , spSkeleton_slots :: Ptr ( Ptr SpSlot )
+    , spSkeleton_drawOrder :: Ptr ( Ptr SpSlot )
+    , spSkeleton_ikConstraintsCount :: CInt
+    , spSkeleton_ikConstraints :: Ptr ( Ptr SpIkConstraint )
+    , spSkeleton_transformConstraintsCount :: CInt
+    , spSkeleton_transformConstraints :: Ptr ( Ptr SpTransformConstraint )
+    , spSkeleton_pathConstraintsCount :: CInt
+    , spSkeleton_pathConstraints :: Ptr ( Ptr SpPathConstraint )
+    , spSkeleton_skin :: Ptr SpSkin
+    , spSkeleton_r :: CFloat
+    , spSkeleton_g :: CFloat
+    , spSkeleton_b :: CFloat
+    , spSkeleton_a :: CFloat
+    , spSkeleton_time :: CFloat
+    , spSkeleton_flipX :: CInt -- ^ boolean
+    , spSkeleton_flipY :: CInt -- ^ boolean
+    , spSkeleton_x :: CFloat
+    , spSkeleton_y :: CFloat
+    } deriving (Show, Eq)
+instance Storable SpSkeleton where
+    alignment _ = #{alignment spSkeleton}
+    sizeOf _    = #{size spSkeleton}
+    peek ptr = do
+        a <- #{peek spSkeleton, data} ptr
+        b <- #{peek spSkeleton, bonesCount} ptr
+        c <- #{peek spSkeleton, bones} ptr
+        d <- #{peek spSkeleton, root} ptr
+        e <- #{peek spSkeleton, slotsCount} ptr
+        f <- #{peek spSkeleton, slots} ptr
+        g <- #{peek spSkeleton, drawOrder} ptr
+        h <- #{peek spSkeleton, ikConstraintsCount} ptr
+        i <- #{peek spSkeleton, ikConstraints} ptr
+        j <- #{peek spSkeleton, transformConstraintsCount} ptr
+        k <- #{peek spSkeleton, transformConstraints} ptr
+        l <- #{peek spSkeleton, pathConstraintsCount} ptr
+        m <- #{peek spSkeleton, pathConstraints} ptr
+        n <- #{peek spSkeleton, skin} ptr
+        o <- #{peek spSkeleton, r} ptr
+        p <- #{peek spSkeleton, g} ptr
+        q <- #{peek spSkeleton, b} ptr
+        r <- #{peek spSkeleton, a} ptr
+        s <- #{peek spSkeleton, time} ptr
+        t <- #{peek spSkeleton, flipX} ptr
+        u <- #{peek spSkeleton, flipY} ptr
+        v <- #{peek spSkeleton, x} ptr
+        w <- #{peek spSkeleton, y} ptr
+        return (SpSkeleton a b c d e f g h i j k l m n o p q r s t u v w)
+    poke ptr (SpSkeleton a b c d e f g h i j k l m n o p q r s t u v w) = do
+        #{poke spSkeleton, data} ptr a
+        #{poke spSkeleton, bonesCount} ptr b
+        #{poke spSkeleton, bones} ptr c
+        #{poke spSkeleton, root} ptr d
+        #{poke spSkeleton, slotsCount} ptr e
+        #{poke spSkeleton, slots} ptr f
+        #{poke spSkeleton, drawOrder} ptr g
+        #{poke spSkeleton, ikConstraintsCount} ptr h
+        #{poke spSkeleton, ikConstraints} ptr i
+        #{poke spSkeleton, transformConstraintsCount} ptr j
+        #{poke spSkeleton, transformConstraints} ptr k
+        #{poke spSkeleton, pathConstraintsCount} ptr l
+        #{poke spSkeleton, pathConstraints} ptr m
+        #{poke spSkeleton, skin} ptr n
+        #{poke spSkeleton, r} ptr o
+        #{poke spSkeleton, g} ptr p
+        #{poke spSkeleton, b} ptr q
+        #{poke spSkeleton, a} ptr r
+        #{poke spSkeleton, time} ptr s
+        #{poke spSkeleton, flipX} ptr t
+        #{poke spSkeleton, flipY} ptr u
+        #{poke spSkeleton, x} ptr v
+        #{poke spSkeleton, y} ptr w
 
 -- #####################
 -- "spine/SkeletonBinary.h"
 -- #####################
 
+-- | SpSkeletonBinary
+data SpSkeletonBinary = SpSkeletonBinary
+    { spSkeletonBinary_scale :: CFloat
+    , spSkeletonBinary_attachmentLoader :: Ptr SpAttachmentLoader
+    , spSkeletonBinary_error :: CString
+    } deriving (Show, Eq)
+instance Storable SpSkeletonBinary where
+    alignment _ = #{alignment spSkeletonBinary}
+    sizeOf _    = #{size spSkeletonBinary}
+    peek ptr = do
+        a <- #{peek spSkeletonBinary, scale} ptr
+        b <- #{peek spSkeletonBinary, attachmentLoader} ptr
+        c <- #{peek spSkeletonBinary, error} ptr
+        return (SpSkeletonBinary a b c)
+    poke ptr (SpSkeletonBinary a b c) = do
+        #{poke spSkeletonBinary, scale} ptr a
+        #{poke spSkeletonBinary, attachmentLoader} ptr b
+        #{poke spSkeletonBinary, error} ptr c
 
 -- #####################
 -- "spine/SkeletonBounds.h"
 -- #####################
 
+-- | SpPolygon
+data SpPolygon = SpPolygon
+    { spPolygon_vertices :: Ptr CFloat
+    , spPolygon_count :: CInt
+    , spPolygon_capacity :: CInt
+    } deriving (Show, Eq)
+instance Storable SpPolygon where
+    alignment _ = #{alignment spPolygon}
+    sizeOf _    = #{size spPolygon}
+    peek ptr = do
+        a <- #{peek spPolygon, vertices} ptr
+        b <- #{peek spPolygon, count} ptr
+        c <- #{peek spPolygon, capacity} ptr
+        return (SpPolygon a b c)
+    poke ptr (SpPolygon a b c) = do
+        #{poke spPolygon, vertices} ptr a
+        #{poke spPolygon, count} ptr b
+        #{poke spPolygon, capacity} ptr c
+
+-- | SpSkeletonBounds
+data SpSkeletonBounds = SpSkeletonBounds
+    { spSkeletonBounds_count :: CInt
+    , spSkeletonBounds_boundingBoxes :: Ptr ( Ptr SpBoundingBoxAttachment )
+    , spSkeletonBounds_polygons :: Ptr ( Ptr SpPolygon )
+    , spSkeletonBounds_minX :: CFloat
+    , spSkeletonBounds_minY :: CFloat
+    , spSkeletonBounds_maxX :: CFloat
+    , spSkeletonBounds_maxY :: CFloat
+    } deriving (Show, Eq)
+instance Storable SpSkeletonBounds where
+    alignment _ = #{alignment spSkeletonBounds}
+    sizeOf _    = #{size spSkeletonBounds}
+    peek ptr = do
+        a <- #{peek spSkeletonBounds, count} ptr
+        b <- #{peek spSkeletonBounds, boundingBoxes} ptr
+        c <- #{peek spSkeletonBounds, polygons} ptr
+        d <- #{peek spSkeletonBounds, minX} ptr
+        e <- #{peek spSkeletonBounds, minY} ptr
+        f <- #{peek spSkeletonBounds, maxX} ptr
+        g <- #{peek spSkeletonBounds, maxY} ptr
+        return (SpSkeletonBounds a b c d e f g)
+    poke ptr (SpSkeletonBounds a b c d e f g) = do
+        #{poke spSkeletonBounds, count} ptr a
+        #{poke spSkeletonBounds, boundingBoxes} ptr b
+        #{poke spSkeletonBounds, polygons} ptr c
+        #{poke spSkeletonBounds, minX} ptr d
+        #{poke spSkeletonBounds, minY} ptr e
+        #{poke spSkeletonBounds, maxX} ptr f
+        #{poke spSkeletonBounds, maxY} ptr g
 
 -- #####################
 -- "spine/SkeletonData.h"
 -- #####################
 
+-- | SpSkeletonData
+data SpSkeletonData = SpSkeletonData
+    { spSkeletonData_version :: CString
+    , spSkeletonData_hash :: CString
+    , spSkeletonData_width :: CFloat
+    , spSkeletonData_height :: CFloat
+    , spSkeletonData_bonesCount :: CInt
+    , spSkeletonData_bones :: Ptr ( Ptr SpBoneData )
+    , spSkeletonData_slotsCount :: CInt
+    , spSkeletonData_slots :: Ptr ( Ptr SpSlotData )
+    , spSkeletonData_skinsCount :: CInt
+    , spSkeletonData_skins :: Ptr ( Ptr SpSkin )
+    , spSkeletonData_defaultSkin :: Ptr SpSkin
+    , spSkeletonData_eventsCount :: CInt
+    , spSkeletonData_events :: Ptr ( Ptr SpEventData )
+    , spSkeletonData_animationsCount :: CInt
+    , spSkeletonData_animations :: Ptr ( Ptr SpAnimation )
+    , spSkeletonData_ikConstraintsCount :: CInt
+    , spSkeletonData_ikConstraints :: Ptr ( Ptr SpIkConstraintData )
+    , spSkeletonData_transformConstraintsCount :: CInt
+    , spSkeletonData_transformConstraints :: Ptr ( Ptr SpTransformConstraintData )
+    , spSkeletonData_pathConstraintsCount :: CInt
+    , spSkeletonData_pathConstraints :: Ptr ( Ptr SpPathConstraintData )
+    } deriving (Show, Eq)
+instance Storable SpSkeletonData where
+    alignment _ = #{alignment spSkeletonData}
+    sizeOf _    = #{size spSkeletonData}
+    peek ptr = do
+        a <- #{peek spSkeletonData, version} ptr
+        b <- #{peek spSkeletonData, hash} ptr
+        c <- #{peek spSkeletonData, width} ptr
+        d <- #{peek spSkeletonData, height} ptr
+        e <- #{peek spSkeletonData, bonesCount} ptr
+        f <- #{peek spSkeletonData, bones} ptr
+        g <- #{peek spSkeletonData, slotsCount} ptr
+        h <- #{peek spSkeletonData, slots} ptr
+        i <- #{peek spSkeletonData, skinsCount} ptr
+        j <- #{peek spSkeletonData, skins} ptr
+        k <- #{peek spSkeletonData, defaultSkin} ptr
+        l <- #{peek spSkeletonData, eventsCount} ptr
+        m <- #{peek spSkeletonData, events} ptr
+        n <- #{peek spSkeletonData, animationsCount} ptr
+        o <- #{peek spSkeletonData, animations} ptr
+        p <- #{peek spSkeletonData, ikConstraintsCount} ptr
+        q <- #{peek spSkeletonData, ikConstraints} ptr
+        r <- #{peek spSkeletonData, transformConstraintsCount} ptr
+        s <- #{peek spSkeletonData, transformConstraints} ptr
+        t <- #{peek spSkeletonData, pathConstraintsCount} ptr
+        u <- #{peek spSkeletonData, pathConstraints} ptr
+        return (SpSkeletonData a b c d e f g h i j k l m n o p q r s t u)
+    poke ptr (SpSkeletonData a b c d e f g h i j k l m n o p q r s t u) = do
+        #{poke spSkeletonData, version} ptr a
+        #{poke spSkeletonData, hash} ptr b
+        #{poke spSkeletonData, width} ptr c
+        #{poke spSkeletonData, height} ptr d
+        #{poke spSkeletonData, bonesCount} ptr e
+        #{poke spSkeletonData, bones} ptr f
+        #{poke spSkeletonData, slotsCount} ptr g
+        #{poke spSkeletonData, slots} ptr h
+        #{poke spSkeletonData, skinsCount} ptr i
+        #{poke spSkeletonData, skins} ptr j
+        #{poke spSkeletonData, defaultSkin} ptr k
+        #{poke spSkeletonData, eventsCount} ptr l
+        #{poke spSkeletonData, events} ptr m
+        #{poke spSkeletonData, animationsCount} ptr n
+        #{poke spSkeletonData, animations} ptr o
+        #{poke spSkeletonData, ikConstraintsCount} ptr p
+        #{poke spSkeletonData, ikConstraints} ptr q
+        #{poke spSkeletonData, transformConstraintsCount} ptr r
+        #{poke spSkeletonData, transformConstraints} ptr s
+        #{poke spSkeletonData, pathConstraintsCount} ptr t
+        #{poke spSkeletonData, pathConstraints} ptr u
 
 -- #####################
 -- "spine/SkeletonJson.h"
 -- #####################
 
+-- | SpSkeletonJson
+data SpSkeletonJson = SpSkeletonJson
+    { spSkeletonJson_scale :: CFloat
+    , spSkeletonJson_attachmentLoader :: Ptr SpAttachmentLoader
+    , spSkeletonJson_error :: CString
+    } deriving (Show, Eq)
+instance Storable SpSkeletonJson where
+    alignment _ = #{alignment spSkeletonJson}
+    sizeOf _    = #{size spSkeletonJson}
+    peek ptr = do
+        a <- #{peek spSkeletonJson, scale} ptr
+        b <- #{peek spSkeletonJson, attachmentLoader} ptr
+        c <- #{peek spSkeletonJson, error} ptr
+        return (SpSkeletonJson a b c)
+    poke ptr (SpSkeletonJson a b c) = do
+        #{poke spSkeletonJson, scale} ptr a
+        #{poke spSkeletonJson, attachmentLoader} ptr b
+        #{poke spSkeletonJson, error} ptr c
 
 -- #####################
 -- "spine/Skin.h"
 -- #####################
 
+-- | SpSkin
+data SpSkin = SpSkin
+    { spSkin_name :: CString
+    } deriving (Show, Eq)
+instance Storable SpSkin where
+    alignment _ = #{alignment spSkin}
+    sizeOf _    = #{size spSkin}
+    peek ptr = do
+        a <- #{peek spSkin, name} ptr
+        return (SpSkin a)
+    poke ptr (SpSkin a) = do
+        #{poke spSkin, name} ptr a
 
 -- #####################
 -- "spine/Slot.h"
 -- #####################
 
+-- | SpSlot
+data SpSlot = SpSlot
+    { spSlot_data :: Ptr SpSlotData
+    , spSlot_bone :: Ptr SpBone
+    , spSlot_r :: CFloat
+    , spSlot_g :: CFloat
+    , spSlot_b :: CFloat
+    , spSlot_a :: CFloat
+    , spSlot_attachment :: Ptr SpAttachment
+    , spSlot_attachmentVerticesCapacity :: CInt
+    , spSlot_attachmentVerticesCount :: CInt
+    , spSlot_attachmentVertices :: Ptr CFloat
+    } deriving (Show, Eq)
+instance Storable SpSlot where
+    alignment _ = #{alignment spSlot}
+    sizeOf _    = #{size spSlot}
+    peek ptr = do
+        a <- #{peek spSlot, data} ptr
+        b <- #{peek spSlot, bone} ptr
+        c <- #{peek spSlot, r} ptr
+        d <- #{peek spSlot, g} ptr
+        e <- #{peek spSlot, b} ptr
+        f <- #{peek spSlot, a} ptr
+        g <- #{peek spSlot, attachment} ptr
+        h <- #{peek spSlot, attachmentVerticesCapacity} ptr
+        i <- #{peek spSlot, attachmentVerticesCount} ptr
+        j <- #{peek spSlot, attachmentVertices} ptr
+        return (SpSlot a b c d e f g h i j)
+    poke ptr (SpSlot a b c d e f g h i j) = do
+        #{poke spSlot, data} ptr a
+        #{poke spSlot, bone} ptr b
+        #{poke spSlot, r} ptr c
+        #{poke spSlot, g} ptr d
+        #{poke spSlot, b} ptr e
+        #{poke spSlot, a} ptr f
+        #{poke spSlot, attachment} ptr g
+        #{poke spSlot, attachmentVerticesCapacity} ptr h
+        #{poke spSlot, attachmentVerticesCount} ptr i
+        #{poke spSlot, attachmentVertices} ptr j
 
 -- #####################
 -- "spine/SlotData.h"
 -- #####################
 
+-- | SpSlotData
+data SpSlotData = SpSlotData
+    { spSlotData_index :: CInt
+    , spSlotData_name :: CString
+    , spSlotData_boneData :: Ptr SpBoneData
+    , spSlotData_attachmentName :: CString
+    , spSlotData_r :: CFloat
+    , spSlotData_g :: CFloat
+    , spSlotData_b :: CFloat
+    , spSlotData_a :: CFloat
+    , spSlotData_blendMode :: SpBlendMode
+    } deriving (Show, Eq)
+instance Storable SpSlotData where
+    alignment _ = #{alignment spSlotData}
+    sizeOf _    = #{size spSlotData}
+    peek ptr = do
+        a <- #{peek spSlotData, index} ptr
+        b <- #{peek spSlotData, name} ptr
+        c <- #{peek spSlotData, boneData} ptr
+        d <- #{peek spSlotData, attachmentName} ptr
+        e <- #{peek spSlotData, r} ptr
+        f <- #{peek spSlotData, g} ptr
+        g <- #{peek spSlotData, b} ptr
+        h <- #{peek spSlotData, a} ptr
+        i <- #{peek spSlotData, blendMode} ptr
+        return (SpSlotData a b c d e f g h i)
+    poke ptr (SpSlotData a b c d e f g h i) = do
+        #{poke spSlotData, index} ptr a
+        #{poke spSlotData, name} ptr b
+        #{poke spSlotData, boneData} ptr c
+        #{poke spSlotData, attachmentName} ptr d
+        #{poke spSlotData, r} ptr e
+        #{poke spSlotData, g} ptr f
+        #{poke spSlotData, b} ptr g
+        #{poke spSlotData, a} ptr h
+        #{poke spSlotData, blendMode} ptr i
 
 -- #####################
 -- "spine/TransformConstraint.h"
 -- #####################
 
+-- | SpTransformConstraint
+data SpTransformConstraint = SpTransformConstraint
+    { spTransformConstraint_data :: Ptr SpTransformConstraintData
+    , spTransformConstraint_bonesCount :: CInt
+    , spTransformConstraint_bones :: Ptr ( Ptr SpBone )
+    , spTransformConstraint_target :: Ptr SpBone
+    , spTransformConstraint_rotateMix :: CFloat
+    , spTransformConstraint_translateMix :: CFloat
+    , spTransformConstraint_scaleMix :: CFloat
+    , spTransformConstraint_shearMix :: CFloat
+    } deriving (Show, Eq)
+instance Storable SpTransformConstraint where
+    alignment _ = #{alignment spTransformConstraint}
+    sizeOf _    = #{size spTransformConstraint}
+    peek ptr = do
+        a <- #{peek spTransformConstraint, data} ptr
+        b <- #{peek spTransformConstraint, bonesCount} ptr
+        c <- #{peek spTransformConstraint, bones} ptr
+        d <- #{peek spTransformConstraint, target} ptr
+        e <- #{peek spTransformConstraint, rotateMix} ptr
+        f <- #{peek spTransformConstraint, translateMix} ptr
+        g <- #{peek spTransformConstraint, scaleMix} ptr
+        h <- #{peek spTransformConstraint, shearMix} ptr
+        return (SpTransformConstraint a b c d e f g h)
+    poke ptr (SpTransformConstraint a b c d e f g h) = do
+        #{poke spTransformConstraint, data} ptr a
+        #{poke spTransformConstraint, bonesCount} ptr b
+        #{poke spTransformConstraint, bones} ptr c
+        #{poke spTransformConstraint, target} ptr d
+        #{poke spTransformConstraint, rotateMix} ptr e
+        #{poke spTransformConstraint, translateMix} ptr f
+        #{poke spTransformConstraint, scaleMix} ptr g
+        #{poke spTransformConstraint, shearMix} ptr h
 
 -- #####################
 -- "spine/TransformConstraintData.h"
 -- #####################
 
+-- | SpTransformConstraintData
+data SpTransformConstraintData = SpTransformConstraintData
+    { spTransformConstraintData_name :: CString
+    , spTransformConstraintData_order :: CInt
+    , spTransformConstraintData_bonesCount :: CInt
+    , spTransformConstraintData_bones :: Ptr ( Ptr SpBoneData )
+    , spTransformConstraintData_target :: Ptr SpBoneData
+    , spTransformConstraintData_rotateMix :: CFloat
+    , spTransformConstraintData_translateMix :: CFloat
+    , spTransformConstraintData_scaleMix :: CFloat
+    , spTransformConstraintData_shearMix :: CFloat
+    , spTransformConstraintData_offsetRotation :: CFloat
+    , spTransformConstraintData_offsetX :: CFloat
+    , spTransformConstraintData_offsetY :: CFloat
+    , spTransformConstraintData_offsetScaleX :: CFloat
+    , spTransformConstraintData_offsetScaleY :: CFloat
+    , spTransformConstraintData_offsetShearY :: CFloat
+    } deriving (Show, Eq)
+instance Storable SpTransformConstraintData where
+    alignment _ = #{alignment spTransformConstraintData}
+    sizeOf _    = #{size spTransformConstraintData}
+    peek ptr = do
+        a <- #{peek spTransformConstraintData, name} ptr
+        b <- #{peek spTransformConstraintData, order} ptr
+        c <- #{peek spTransformConstraintData, bonesCount} ptr
+        d <- #{peek spTransformConstraintData, bones} ptr
+        e <- #{peek spTransformConstraintData, target} ptr
+        f <- #{peek spTransformConstraintData, rotateMix} ptr
+        g <- #{peek spTransformConstraintData, translateMix} ptr
+        h <- #{peek spTransformConstraintData, scaleMix} ptr
+        i <- #{peek spTransformConstraintData, shearMix} ptr
+        j <- #{peek spTransformConstraintData, offsetRotation} ptr
+        k <- #{peek spTransformConstraintData, offsetX} ptr
+        l <- #{peek spTransformConstraintData, offsetY} ptr
+        m <- #{peek spTransformConstraintData, offsetScaleX} ptr
+        n <- #{peek spTransformConstraintData, offsetScaleY} ptr
+        o <- #{peek spTransformConstraintData, offsetShearY} ptr
+        return (SpTransformConstraintData a b c d e f g h i j k l m n o)
+    poke ptr (SpTransformConstraintData a b c d e f g h i j k l m n o) = do
+        #{poke spTransformConstraintData, name} ptr a
+        #{poke spTransformConstraintData, order} ptr b
+        #{poke spTransformConstraintData, bonesCount} ptr c
+        #{poke spTransformConstraintData, bones} ptr d
+        #{poke spTransformConstraintData, target} ptr e
+        #{poke spTransformConstraintData, rotateMix} ptr f
+        #{poke spTransformConstraintData, translateMix} ptr g
+        #{poke spTransformConstraintData, scaleMix} ptr h
+        #{poke spTransformConstraintData, shearMix} ptr i
+        #{poke spTransformConstraintData, offsetRotation} ptr j
+        #{poke spTransformConstraintData, offsetX} ptr k
+        #{poke spTransformConstraintData, offsetY} ptr l
+        #{poke spTransformConstraintData, offsetScaleX} ptr m
+        #{poke spTransformConstraintData, offsetScaleY} ptr n
+        #{poke spTransformConstraintData, offsetShearY} ptr o
 
 -- #####################
 -- "spine/VertexAttachment.h"
 -- #####################
 
-
-
-
+-- | SpVertexAttachment
+data SpVertexAttachment = SpVertexAttachment
+    { spVertexAttachment_super :: SpAttachment
+    , spVertexAttachment_bonesCount :: CInt
+    , spVertexAttachment_bones :: Ptr CInt
+    , spVertexAttachment_verticesCount :: CInt
+    , spVertexAttachment_vertices :: Ptr CFloat
+    , spVertexAttachment_worldVerticesLength :: CInt
+    } deriving (Show, Eq)
+instance Storable SpVertexAttachment where
+    alignment _ = #{alignment spVertexAttachment}
+    sizeOf _    = #{size spVertexAttachment}
+    peek ptr = do
+        a <- #{peek spVertexAttachment, super} ptr
+        b <- #{peek spVertexAttachment, bonesCount} ptr
+        c <- #{peek spVertexAttachment, bones} ptr
+        d <- #{peek spVertexAttachment, verticesCount} ptr
+        e <- #{peek spVertexAttachment, vertices} ptr
+        f <- #{peek spVertexAttachment, worldVerticesLength} ptr
+        return (SpVertexAttachment a b c d e f)
+    poke ptr (SpVertexAttachment a b c d e f) = do
+        #{poke spVertexAttachment, super} ptr a
+        #{poke spVertexAttachment, bonesCount} ptr b
+        #{poke spVertexAttachment, bones} ptr c
+        #{poke spVertexAttachment, verticesCount} ptr d
+        #{poke spVertexAttachment, vertices} ptr e
+        #{poke spVertexAttachment, worldVerticesLength} ptr f
 
 --
