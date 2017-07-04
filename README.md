@@ -1,53 +1,66 @@
 # hspine
 
-+ 確認連結 spine/\*\*.h 和 libspine-c.a
-+ 準備好 Spine.Raw.\* 的空檔案
-+ 下一步
-    + 連結測試 SFML
-    + 參考 spine-sfml
++ [github](https://github.com/jaiyalas/hspine/)
++ [trello](https://trello.com/b/qRRM6cL3/hspine)
++ [wiki](https://github.com/jaiyalas/hspine/wiki)
 
 ## todo
 
-+ [ ] Animation
-+ [ ] AnimationState
-+ [ ] AnimationStateData
-+ [ ] Atlas
-+ [ ] AtlasAttachmentLoader
-+ [ ] Attachment
-+ [ ] AttachmentLoader
-+ [ ] Bone
-+ [ ] BoneData
-+ [ ] BoundingBoxAttachment
-+ [ ] Event
-+ [ ] EventData
-+ [ ] IkConstraint
-+ [ ] IkConstraintData
-+ [ ] MeshAttachment
-+ [ ] PathAttachment
-+ [ ] PathConstraint
-+ [ ] PathConstraintData
-+ [ ] RegionAttachment
-+ [ ] Skeleton
-+ [ ] SkeletonBinary
-+ [ ] SkeletonBounds
-+ [ ] SkeletonData
-+ [ ] SkeletonJson
-+ [ ] Skin
-+ [ ] Slot
-+ [ ] SlotData
-+ [ ] TransformConstraint
-+ [ ] TransformConstraintData
-+ [ ] VertexAttachment
++ [ ] loading spine files
++ [ ] rendering with SDL
++ [ ]連結測試 SFML
+    + 參考 spine-sfml
 
-## malloc, free and pointer op
+## done
 
-+ [Foreign.Marshal.Array](https://hackage.haskell.org/package/base-4.9.1.0/docs/Foreign-Marshal-Array.html)
-    + `mallocArray :: Storable a => Int -> IO (Ptr a)`
-    + `peekArray :: Storable a => Int -> Ptr a -> IO [a]`
-    + `pokeArray :: Storable a => Ptr a -> [a] -> IO ()`
-    + `newArray :: Storable a => [a] -> IO (Ptr a) `
-    + `withArray :: Storable a => [a] -> (Ptr a -> IO b) -> IO b`
-+ [Foreign.Marshal.Alloc](https://hackage.haskell.org/package/base-4.9.1.0/docs/Foreign-Marshal-Alloc.html)
-    + `alloca :: Storable a => (Ptr a -> IO b) -> IO b`
-    + `malloc :: Storable a => IO (Ptr a)`
-    + `free :: Ptr a -> IO ()`
++ [x] Spine.Raw.*
+    + [x] Animation
+    + [x] AnimationState
+    + [x] AnimationStateData
+    + [x] Atlas
+    + [x] AtlasAttachmentLoader
+    + [x] Attachment
+    + [x] AttachmentLoader
+    + [x] Bone
+    + [x] BoneData
+    + [x] BoundingBoxAttachment
+    + [x] Event
+    + [x] EventData
+    + [x] IkConstraint
+    + [x] IkConstraintData
+    + [x] MeshAttachment
+    + [x] PathAttachment
+    + [x] PathConstraint
+    + [x] PathConstraintData
+    + [x] RegionAttachment
+    + [x] Skeleton
+    + [x] SkeletonBinary
+    + [x] SkeletonBounds
+    + [x] SkeletonData
+    + [x] SkeletonJson
+    + [x] Skin
+    + [x] Slot
+    + [x] SlotData
+    + [x] TransformConstraint
+    + [x] TransformConstraintData
+    + [x] VertexAttachment
++ [x] 確認連結 spine/\*\*.h 和 libspine-c.a
++ [x] 準備好 Spine.Raw.\* 的空檔案
+
+# reference
+
+## spine documentation
+
++ [Spine User Guide](http://esotericsoftware.com/spine-user-guide)
++ [Spine Runtimes Guide](http://esotericsoftware.com/spine-runtimes-guide)
+    + [Runtime Architecture](http://esotericsoftware.com/spine-runtime-architecture)
+    + [Loading Skeleton Data](http://esotericsoftware.com/spine-loading-skeleton-data)
+    + [Applying Animations](http://esotericsoftware.com/spine-applying-animations)
+    + [Runtime Skeletons](http://esotericsoftware.com/spine-runtime-skeletons)
+    + [Runtime Skins](http://esotericsoftware.com/spine-runtime-skins)
+    + [API Reference](http://esotericsoftware.com/spine-api-reference)
++ [Spine-C Runtime Documentation](http://esotericsoftware.com/spine-c)
++ Export Format
+    + [JSON export format](http://esotericsoftware.com/spine-json-format)
+    + [Binary export format](http://esotericsoftware.com/spine-binary-format)
+    + [Atlas export format](http://esotericsoftware.com/spine-atlas-format)
