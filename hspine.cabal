@@ -51,7 +51,7 @@ library
         -- spine/extension.h
         -- spine/spine.h
     extra-lib-dirs:
-        /Users/jaiyalas/Project/hspine/spine-c/build
+        /Users/jaiyalas/Project/hspine/spine-c/build/
     extra-libraries:
         spine-c
     ghc-options: -w
