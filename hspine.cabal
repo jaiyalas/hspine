@@ -15,8 +15,12 @@ extra-source-files:  README.md
 
 library
     include-dirs:
+        bridge
+        --
         spine-c/spine-c/include
     install-includes:
+        bridge.h
+        --
         spine/Animation.h
         spine/AnimationState.h
         spine/AnimationStateData.h
@@ -56,6 +60,8 @@ library
         spine-c
     ghc-options: -w
     exposed-modules:
+        --
+        Bridge
         --
         Spine
         -- -- -- -- --
