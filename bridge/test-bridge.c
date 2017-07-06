@@ -1,12 +1,15 @@
 /*
 gcc -I/usr/local/include/SDL2 -D_THREAD_SAFE -L/usr/local/lib -lSDL2 -lSDL2_image -I/Users/jaiyalas/Project/hspine/spine-c/spine-c/include -L/Users/jaiyalas/Project/hspine/spine-c/build -lspine-c -o main test-bridge.c
+
+
+/Users/jaiyalas/Project/hspine/spine-c/build/libspine-c.a
 */
 #include <stdio.h>
 #include <SDL.h>
 #include <SDL_image.h>
 #include <spine/spine.h>
 #include <spine/extension.h>
-#include "Bridge.h"
+#include "bridge.h"
 
 
 int main(){

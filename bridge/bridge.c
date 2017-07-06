@@ -10,13 +10,16 @@
 #include <SDL_image.h>
 #include <spine/spine.h>
 #include <spine/extension.h>
-#include "Bridge.h"
+#include "bridge.h"
 
 /*
 https://github.com/gabomdq/spine-runtimes/blob/master/spine-sdl2/src/spine/spine-sdl2.cpp
 */
+// void _spAtlasPage_createTexture (spAtlasPage* self, const char* path);
+// void _spAtlasPage_disposeTexture (spAtlasPage* self);
+// char* _spUtil_readFile (const char* path, int* length);
 //
-void _AtlasPage_createTexture (spAtlasPage* self, const char* path, void *param) {
+void _spAtlasPage_createTexture (spAtlasPage* self, const char* path, void *param) {
     self->rendererObject = NULL;
     SDL_Surface* surface = IMG_Load(path);
     if (surface) {
@@ -33,14 +36,14 @@ void _AtlasPage_createTexture (spAtlasPage* self, const char* path, void *param)
     }
 }
 //
-void _AtlasPage_disposeTexture (spAtlasPage* self) {
+void _spAtlasPage_disposeTexture (spAtlasPage* self) {
     if (self->rendererObject) {
         SDL_DestroyTexture((SDL_Texture*)self->rendererObject);
         self->rendererObject = NULL;
     }
 }
 //
-char* _Util_readFile (const char* path, int* length) {
+char* _spUtil_readFile (const char* path, int* length) {
     SDL_RWops* file = SDL_RWFromFile(path, "rb");
     if (!file) return NULL;
     //
