@@ -12,9 +12,6 @@
 #include <spine/extension.h>
 #include "bridge.h"
 
-/*
-https://github.com/gabomdq/spine-runtimes/blob/master/spine-sdl2/src/spine/spine-sdl2.cpp
-*/
 // void _spAtlasPage_createTexture (spAtlasPage* self, const char* path);
 // void _spAtlasPage_disposeTexture (spAtlasPage* self);
 // char* _spUtil_readFile (const char* path, int* length);
