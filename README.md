@@ -1,17 +1,26 @@
 # hspine
 
-+ [github](https://github.com/jaiyalas/hspine/)
-+ [trello](https://trello.com/b/qRRM6cL3/hspine)
-+ [wiki](https://github.com/jaiyalas/hspine/wiki)
+[![Haskell](http://b.repl.ca/v1/language-haskell-green.png)](http://haskell.org)
 
-## todo
+The `hspine` is a haskell binding for the runtime library of well-known 2D animation tool - [*spine*](https://github.com/EsotericSoftware/spine-runtimes).
+
++ `/spine-c` - the source code of spine-c 3.5
++ `/simpar` - to trnaslating spine-c into .hsc semi-automatively
++ `/src` - the hspine library
+
+## Building
+
+> stack steup
+> stack build
+
+## Progress
+
+### todo
 
 + [ ] loading spine files
 + [ ] rendering with SDL
-+ [ ]連結測試 SFML
-    + 參考 spine-sfml
 
-## done
+### done
 
 + [x] Spine.Raw.*
     + [x] Animation
@@ -44,8 +53,8 @@
     + [x] TransformConstraint
     + [x] TransformConstraintData
     + [x] VertexAttachment
-+ [x] 確認連結 spine/\*\*.h 和 libspine-c.a
-+ [x] 準備好 Spine.Raw.\* 的空檔案
++ [x] Ensure that `spine/\*\*.h` and `libspine-c.a` works.
++ [x] Ready blank files under `Spine.Raw.\*`
 
 # reference
 
